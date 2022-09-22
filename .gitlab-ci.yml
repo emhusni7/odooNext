@@ -1,0 +1,34 @@
+image: node:16-bullseye
+
+stages:
+  - staging
+  - deploy
+
+cache:
+  paths:
+    - node_modules/
+  key: "$CI_BUILD_REPO"
+
+Staging:
+  stage: staging
+  only:
+    - dev
+  script:
+    - npm install -g --unsafe-perm firebase-tools@8.1
+    - npm install
+    - npm run build
+    - npm run export
+    - firebase use odoo-pwa --token $FIREBASE_TOKEN
+    - firebase deploy --only hosting:staging -m "Pipe $CI_PIPELINE_ID Build $CI_BUILD_ID" --token $FIREBASE_TOKEN
+
+Production:
+  stage: deploy
+  only:
+    - master
+  script:
+    - npm install -g --unsafe-perm firebase-tools@8.1
+    - npm install
+    - npm run build
+    - npm run export
+    - firebase use odoo-pwa --token $FIREBASE_TOKEN
+    - firebase deploy --only hosting:production -m "Pipe $CI_PIPELINE_ID Build $CI_BUILD_ID" --token $FIREBASE_TOKEN

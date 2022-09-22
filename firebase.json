@@ -1,0 +1,17 @@
+{
+  "hosting": [
+    {
+      "target": "production",
+      "public": "out",
+      "cleanUrls": true,
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    },
+    {
+      "target": "staging",
+      "site": "dev-odoo-pwa",
+      "public": "out",
+      "cleanUrls": true,
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    }
+  ]
+}

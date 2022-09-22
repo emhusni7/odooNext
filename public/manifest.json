@@ -1,0 +1,21 @@
+{
+  "short_name": "Odoo",
+  "name": "Odoo Operation",
+  "icons": [
+    {
+      "src": "static/icons-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "static/icons-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "../",
+  "background_color": "#F7FBFC",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#4565BB"
+}

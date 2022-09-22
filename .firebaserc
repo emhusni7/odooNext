@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "odoo-pwa"
+  },
+  "targets": {
+    "odoo-pwa": {
+      "hosting": {
+        "production": [
+          "odoo-pwa"
+        ],
+        "staging": [
+          "dev-odoo-pwa"
+        ]
+      }
+    }
+  }
+}
