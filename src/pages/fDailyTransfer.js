@@ -106,7 +106,7 @@ const PDTransfer = ({ submit, msg }) => {
   return (
     <>
       <Head>
-        <title>Odoo App</title>
+        <title>ALUBLESS</title>
       </Head>
       <Box className={classes.root}>
         <Paper component="form" className={classes.paper}>

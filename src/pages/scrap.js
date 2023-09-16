@@ -42,7 +42,7 @@ const FullScreenDialog = ({ index, record, addScrap, mode, loading, type }) => {
 
   return (
     <div>
-      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+      <Button variant="outlined" color="error" onClick={handleClickOpen}>
         Reject/Scrap
       </Button>
       <Dialog

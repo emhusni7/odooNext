@@ -268,7 +268,7 @@ const EditPage = ({ setTitle, setLoading, setMsgBox, loading }) => {
   return (
     <>
       <Head>
-        <title>Odoo App - Validate</title>
+        <title>ALUBLESS - Validate</title>
       </Head>
       <div className={classes.root}>
         <Grid container spacing={1}>

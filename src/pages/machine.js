@@ -899,7 +899,7 @@ const MachinePage = ({ setTitle }) => {
   return (
     <>
       <Head>
-        <title>Odoo App - Login</title>
+        <title>ALUBLESS - Login</title>
       </Head>
       <Fade in>
         <Box className={classes.root}>
@@ -937,6 +937,7 @@ const MachinePage = ({ setTitle }) => {
 
                   <Box className={classes.wrapper}>
                     <Button
+                      variant="contained"
                       className={classes.btnStyle}
                       fullWidth
                       type="submit"

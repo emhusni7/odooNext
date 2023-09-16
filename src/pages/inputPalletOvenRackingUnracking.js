@@ -186,7 +186,7 @@ const InputPalletOvenRackingUnrackingPage = ({
                         setMsgBox({ variant: 'error', message: 'Rack Kosong' });
                       }
                     }}
-                    className={classes.button}
+                    variant="contained"
                   >
                     Add Pallet
                   </Button>
@@ -257,7 +257,11 @@ const InputPalletOvenRackingUnrackingPage = ({
                 </TableContainer>
               </Box>
               <Box className={classes.wrapper}>
-                <Button style={{ marginTop: '20px' }} onClick={getProcess}>
+                <Button
+                  variant="contained"
+                  style={{ marginTop: '20px' }}
+                  onClick={getProcess}
+                >
                   Process
                 </Button>
               </Box>

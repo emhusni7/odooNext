@@ -278,7 +278,9 @@ const DetailScrapPage = ({
                   </Grid>
                 </Grid>
 
-                <Button type="submit">Save</Button>
+                <Button variant="contained" type="submit">
+                  Save
+                </Button>
               </Paper>
             </form>
           </>

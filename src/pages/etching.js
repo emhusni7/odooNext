@@ -379,7 +379,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
   return (
     <>
       <Head>
-        <title>Odoo App</title>
+        <title>ALUBLESS</title>
       </Head>
 
       <div className={classes.root}>
@@ -388,7 +388,9 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
             <Grid item xs={3} md={3} sm={3}>
               <Paper className={classes.paper} elevation={0}>
                 {etching.status === 'New' ? (
-                  <Button onClick={() => inWork()}>Start</Button>
+                  <Button variant="contained" onClick={() => inWork()}>
+                    Start
+                  </Button>
                 ) : (
                   ''
                 )}
@@ -398,7 +400,9 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
             <Grid item xs={3} md={3} sm={3}>
               <Paper className={classes.paper} elevation={0}>
                 {etching.status === 'In Progress' ? (
-                  <Button onClick={() => setDone()}>End</Button>
+                  <Button variant="contained" onClick={() => setDone()}>
+                    End
+                  </Button>
                 ) : (
                   ''
                 )}

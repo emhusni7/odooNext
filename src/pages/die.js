@@ -177,7 +177,7 @@ const DiePage = ({ setTitle, setMsgBox, setLoading }) => {
   return (
     <>
       <Head>
-        <title>Odoo App - List MO Die</title>
+        <title>ALUBLESS - List MO Die</title>
       </Head>
 
       <>

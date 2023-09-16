@@ -1,32 +1,40 @@
 import React, { useEffect } from 'react';
 import Head from 'next/head';
+// eslint-disable-next-line no-unused-vars
 import Link from 'next/link';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-
-import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardActionArea from '@material-ui/core/CardActionArea';
+
+import Divider from '@material-ui/core/Divider';
 import PropTypes from 'prop-types';
 import OdooLib from '../models/odoo';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles({
   root: {
-    flexGrow: 1,
-    paddingTop: '100px',
+    minWidth: 275,
+    margin: '4px',
   },
-  paper: {
-    height: 150,
-    width: 100,
+  bullet: {
+    display: 'inline-block',
+    margin: '0 2px',
+    transform: 'scale(0.8)',
   },
-  control: {
-    padding: theme.spacing(2),
+  title: {
+    fontSize: 14,
   },
-}));
+  pos: {
+    marginBottom: 12,
+  },
+});
 
 const IndexPage = ({ setTitle, setMsgBox }) => {
   const classes = useStyles();
-  setTitle('Main Menu');
+  setTitle('');
   const uid = localStorage.getItem('uid');
   const [menu, addMenu] = React.useState([]);
   const odoo = new OdooLib();
@@ -52,12 +60,39 @@ const IndexPage = ({ setTitle, setMsgBox }) => {
   return (
     <div>
       <Head>
-        <title>Odoo App</title>
+        <title>ALUBLESS</title>
       </Head>
       <Grid container className={classes.root} spacing={1}>
         <Grid item xs={12}>
           <Grid container justify="center" spacing={2}>
             {menu.map((menuItem) => (
+              <Card className={classes.root} hover>
+                <CardActionArea href={menuItem.comment}>
+                  <CardHeader
+                    avatar={
+                      <img
+                        src={`/static/${
+                          menuItem.name
+                            .toLowerCase()
+                            .replace(' ', '')
+                            .split('.')[1]
+                        }.png`}
+                        width={35}
+                        height={30}
+                        alt={menuItem.name.replace(' ', '').split('.')[1]}
+                      />
+                    }
+                    title={
+                      <Typography style={{ color: '#0719fd', fontWeight: 700 }}>
+                        {menuItem.name.split('.')[1]}
+                      </Typography>
+                    }
+                  />
+                  <Divider />
+                </CardActionArea>
+              </Card>
+            ))}
+            {/* {menu.map((menuItem) => (
               <Grid key={menuItem.name} item>
                 <Link href={`${menuItem.comment}`}>
                   <Paper className={classes.paper}>
@@ -82,7 +117,7 @@ const IndexPage = ({ setTitle, setMsgBox }) => {
                   </Paper>
                 </Link>
               </Grid>
-            ))}
+            ))} */}
           </Grid>
         </Grid>
       </Grid>

@@ -33,7 +33,7 @@ const ScanRackPage = ({ setTitle }) => {
   return (
     <>
       <Head>
-        <title>Odoo App - Scanning Rack</title>
+        <title>ALUBLESS - Scanning Rack</title>
       </Head>
       <Box className="row">
         <QrReader

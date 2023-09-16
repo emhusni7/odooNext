@@ -22,7 +22,7 @@ import OdooLib from '../models/odoo';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: '#722076',
+    backgroundColor: '#0b4be0',
     color: theme.palette.common.white,
   },
   body: {
@@ -90,6 +90,9 @@ const ListPalletOvenRackingUnrackingPage = ({
   const [rows, setRows] = React.useState([]);
   const [outname, setOutname] = React.useState([]);
   const [disabled, setDisable] = React.useState(false);
+  const minDate = OdooLib.MinDateTime(new Date().toISOString());
+  const maxDate = OdooLib.CurrentTime(new Date().toISOString());
+  const [date, setDate] = React.useState(false);
 
   const getData = async () => {
     setLoading(true);
@@ -163,10 +166,17 @@ const ListPalletOvenRackingUnrackingPage = ({
 
   const setInwork = (e) => {
     e.preventDefault();
-    console.log(e.detail);
     switch (e.detail) {
       case 1:
-        setStart();
+        if (!date || date < minDate) {
+          setMsgBox({
+            variant: 'error',
+            message:
+              'Tanggal Harus Di Isi / Tanggal Backdate Lebih dari 1 hari',
+          });
+        } else {
+          setStart();
+        }
         break;
       case 2:
         console.log('double click');
@@ -228,7 +238,12 @@ const ListPalletOvenRackingUnrackingPage = ({
     } else {
       setLoading(true);
       localStorage.setItem('loading', true);
-      const data = await odoo.actionDone(outputIds, scrapbs, racks);
+      const data = await odoo.actionDone(
+        outputIds,
+        scrapbs,
+        racks,
+        OdooLib.OdooDateTime(date)
+      );
       if (!data.faultCode) {
         const rws = rows
           .filter((x) => outputIds.includes(x.output_id))
@@ -256,7 +271,16 @@ const ListPalletOvenRackingUnrackingPage = ({
     console.log(e.detail);
     switch (e.detail) {
       case 1:
-        setDoneS();
+        if (!date || date < minDate) {
+          setMsgBox({
+            variant: 'error',
+            message:
+              'Tanggal Harus Di Isi / Tanggal Backdate Lebih dari 1 hari',
+          });
+        } else {
+          setDoneS();
+        }
+
         break;
       case 2:
         console.log('double click');
@@ -340,288 +364,380 @@ const ListPalletOvenRackingUnrackingPage = ({
       <Head>
         <title>Odoo Warehouse - List Rack</title>
       </Head>
-      <TableContainer component={Paper} className={classes.table}>
-        <Table className={classes.table} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              {mode === 'end' &&
-              ['unracking', 'anodize', 'painting'].includes(type) &&
-              !disabled ? (
-                <StyledTableCell align="center">Check</StyledTableCell>
-              ) : (
-                ''
-              )}
-              <StyledTableCell align="center">Image</StyledTableCell>
-              <StyledTableCell align="center">MO</StyledTableCell>
-              <StyledTableCell align="center">Product</StyledTableCell>
-              {mode === 'end' ? (
-                <StyledTableCell align="center">Start Date</StyledTableCell>
-              ) : (
-                ''
-              )}
-              {mode === 'end' && disabled ? (
-                <StyledTableCell align="center">End Date</StyledTableCell>
-              ) : (
-                ''
-              )}
-              <StyledTableCell align="center">Rack</StyledTableCell>
-              <StyledTableCell align="center">Qty</StyledTableCell>
-              {mode === 'start' ? (
-                <StyledTableCell align="center">Qty Produce</StyledTableCell>
-              ) : (
-                ''
-              )}
-              <StyledTableCell align="center">Type</StyledTableCell>
-              <StyledTableCell align="center">Note</StyledTableCell>
-              {(mode === 'end' && !disabled) ||
-              (mode === 'start' &&
-                ['painting', 'anodize', 'unracking', 'preChromate'].includes(
-                  type
-                ) &&
-                !disabled) ? (
-                <StyledTableCell align="center">Action</StyledTableCell>
-              ) : (
-                ''
-              )}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows
-              .sort((a, b) =>
-                // eslint-disable-next-line no-nested-ternary
-                a.output_id > b.output_id
-                  ? 1
-                  : a.output_id < b.output_id
-                  ? -1
-                  : 0
-              )
-              .map((row, index) => (
-                <>
-                  <StyledTableRow hover>
-                    {mode === 'end' &&
-                    row.type === 'good' &&
-                    ['unracking', 'anodize', 'painting'].includes(type) &&
-                    !disabled ? (
-                      <StyledTableCell align="center">
-                        <Checkbox
-                          onChange={(e) => {
-                            const out = { ...rows[index] };
-                            out.checked = e.target.checked;
-                            rows[index] = out;
-                            setRows(rows);
-                          }}
-                          disabled={disabled}
-                          value={row.checked}
-                          color="primary"
-                          inputProps={{ 'aria-label': 'Check' }}
-                        />
-                      </StyledTableCell>
-                    ) : mode === 'end' &&
-                      row.type !== 'good' &&
-                      ['unracking', 'anodize', 'painting'].includes(type) ? (
-                      <StyledTableCell align="center" />
-                    ) : (
-                      ''
-                    )}
-
-                    <StyledTableCell
-                      className={classes.linkStyle}
-                      align="center"
-                      scope=""
-                    >
-                      <img
-                        style={{ width: '50px', height: '50px' }}
-                        src={`data:image/jpeg;base64,${row.image}`}
-                        alt=""
-                      />
-                    </StyledTableCell>
+      <Grid container spacing={3}>
+        <Grid item xs={4}>
+          {mode === 'start' ? (
+            <TextField
+              id="date"
+              label="Tanggal"
+              type="datetime-local"
+              value={
+                rows.length > 0
+                  ? OdooLib.formatDateTime(rows[0].date_start)
+                  : OdooLib.CurrentTime(new Date().toISOString())
+              }
+              onChange={(e) => {
+                const newRows = rows.map((x) => {
+                  return {
+                    ...x,
+                    date_start: OdooLib.OdooDateTime(e.target.value),
+                  };
+                });
+                setRows(newRows);
+                setDate(e.target.value);
+              }}
+              required
+              className={classes.textField}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              InputProps={{
+                // readOnly: press.status === 'Done',
+                inputProps: {
+                  min: minDate,
+                  max: maxDate,
+                },
+              }}
+            />
+          ) : (
+            <TextField
+              id="date"
+              label="Tanggal"
+              type="datetime-local"
+              value={
+                rows.length > 0
+                  ? rows[0].date_finished
+                    ? OdooLib.formatDateTime(rows[0].date_finished)
+                    : OdooLib.CurrentTime(new Date().toISOString())
+                  : OdooLib.CurrentTime(new Date().toISOString())
+              }
+              onChange={(e) => {
+                const newRows = rows.map((x) => {
+                  return {
+                    ...x,
+                    date_finished: OdooLib.OdooDateTime(e.target.value),
+                  };
+                });
+                setRows(newRows);
+                setDate(e.target.value);
+              }}
+              required
+              className={classes.textField}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              InputProps={{
+                // readOnly: press.status === 'Done',
+                inputProps: {
+                  min: minDate,
+                  max: maxDate,
+                },
+              }}
+            />
+          )}
+        </Grid>
+        <Grid item xs={6} />
+        <Grid item xs={12}>
+          <TableContainer component={Paper} className={classes.table}>
+            <Table className={classes.table} aria-label="customized table">
+              <TableHead>
+                <TableRow>
+                  {mode === 'end' &&
+                  ['unracking', 'anodize', 'painting'].includes(type) &&
+                  !disabled ? (
+                    <StyledTableCell align="center">Check</StyledTableCell>
+                  ) : (
+                    ''
+                  )}
+                  <StyledTableCell align="center">Image</StyledTableCell>
+                  <StyledTableCell align="center">MO</StyledTableCell>
+                  <StyledTableCell align="center">Product</StyledTableCell>
+                  {mode === 'end' ? (
+                    <StyledTableCell align="center">Start Date</StyledTableCell>
+                  ) : (
+                    ''
+                  )}
+                  {mode === 'end' && disabled ? (
+                    <StyledTableCell align="center">End Date</StyledTableCell>
+                  ) : (
+                    ''
+                  )}
+                  <StyledTableCell align="center">Rack</StyledTableCell>
+                  <StyledTableCell align="center">Qty</StyledTableCell>
+                  {mode === 'start' ? (
                     <StyledTableCell align="center">
-                      {row.moname}
+                      Qty Produce
                     </StyledTableCell>
-                    <StyledTableCell align="left">
-                      {row.productname}
-                    </StyledTableCell>
+                  ) : (
+                    ''
+                  )}
+                  <StyledTableCell align="center">Type</StyledTableCell>
+                  <StyledTableCell align="center">Note</StyledTableCell>
+                  {(mode === 'end' && !disabled) ||
+                  (mode === 'start' &&
+                    [
+                      'painting',
+                      'anodize',
+                      'unracking',
+                      'preChromate',
+                    ].includes(type) &&
+                    !disabled) ? (
+                    <StyledTableCell align="center">Action</StyledTableCell>
+                  ) : (
+                    ''
+                  )}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows
+                  .sort((a, b) =>
+                    // eslint-disable-next-line no-nested-ternary
+                    a.output_id > b.output_id
+                      ? 1
+                      : a.output_id < b.output_id
+                      ? -1
+                      : 0
+                  )
+                  .map((row, index) => (
+                    <>
+                      <StyledTableRow hover>
+                        {mode === 'end' &&
+                        row.type === 'good' &&
+                        ['unracking', 'anodize', 'painting'].includes(type) &&
+                        !disabled ? (
+                          <StyledTableCell align="center">
+                            <Checkbox
+                              onChange={(e) => {
+                                const out = { ...rows[index] };
+                                out.checked = e.target.checked;
+                                rows[index] = out;
+                                setRows(rows);
+                              }}
+                              disabled={disabled}
+                              value={row.checked}
+                              color="primary"
+                              inputProps={{ 'aria-label': 'Check' }}
+                            />
+                          </StyledTableCell>
+                        ) : mode === 'end' &&
+                          row.type !== 'good' &&
+                          ['unracking', 'anodize', 'painting'].includes(
+                            type
+                          ) ? (
+                          <StyledTableCell align="center" />
+                        ) : (
+                          ''
+                        )}
 
-                    {mode === 'end' ? (
-                      <StyledTableCell align="center">
-                        {row.datestart
-                          ? OdooLib.formatDateTime(row.datestart)
-                          : ''}
-                      </StyledTableCell>
-                    ) : (
-                      ''
-                    )}
-                    {mode === 'end' && disabled ? (
-                      <StyledTableCell align="center">
-                        {OdooLib.formatDateTime(row.date_finished)}
-                      </StyledTableCell>
-                    ) : (
-                      ''
-                    )}
-                    <StyledTableCell align="center">
-                      {(row.wc_type === 'F' || type === 'anodize') &&
-                      mode === 'end' &&
-                      !disabled ? (
-                        <TextField
-                          id="rack"
-                          name="rack"
-                          value={row.rack}
-                          onChange={(e) => {
-                            const ln = [...rows];
-                            const lnr = ln[index];
-                            lnr.rack = e.target.value;
-                            ln[index] = lnr;
-                            setRows(ln);
-                          }}
-                        />
-                      ) : (
-                        row.rack
-                      )}
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      {mode === 'end' ? row.qty : row.qtyNett}
-                    </StyledTableCell>
-                    {mode === 'start' ? (
-                      <StyledTableCell align="right">
-                        {TextF(index, row.qty)}
-                      </StyledTableCell>
-                    ) : (
-                      ''
-                    )}
-                    <StyledTableCell align="center">{row.type}</StyledTableCell>
-                    <StyledTableCell align="center">{row.note}</StyledTableCell>
-                    {(row.type === 'good' &&
-                      mode === 'end' &&
-                      row.note !== 'Roll' &&
-                      !disabled) ||
-                    (mode === 'start' &&
-                      [
-                        'painting',
-                        'anodize',
-                        'unracking',
-                        'preChromate',
-                      ].includes(type) &&
-                      !disabled &&
-                      row.type === 'good') ? (
-                      <StyledTableCell align="center">
-                        <Scrap
-                          index={index}
-                          record={{
-                            qty: row.qty,
-                            productid: row.productid,
-                            productname: row.productname,
-                            id: row.id,
-                            output_id: row.output_id,
-                          }}
-                          addScrap={addScrap}
-                          mode={mode}
-                          loading={setLoading}
-                          type={type}
-                        />
-                      </StyledTableCell>
-                    ) : (
-                      ''
-                    )}
-                  </StyledTableRow>
-                  {row.lines
-                    ? row.lines.map((x, idx) => (
-                        <StyledTableRow>
-                          {mode === 'end' &&
-                          row.type === 'good' &&
-                          ['unracking', 'anodize', 'painting'].includes(type) &&
+                        <StyledTableCell
+                          className={classes.linkStyle}
+                          align="center"
+                          scope=""
+                        >
+                          <img
+                            style={{ width: '50px', height: '50px' }}
+                            src={`data:image/jpeg;base64,${row.image}`}
+                            alt=""
+                          />
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {row.moname}
+                        </StyledTableCell>
+                        <StyledTableCell align="left">
+                          {row.productname}
+                        </StyledTableCell>
+
+                        {mode === 'end' ? (
+                          <StyledTableCell align="center">
+                            {row.datestart
+                              ? OdooLib.formatDateTime(row.datestart)
+                              : ''}
+                          </StyledTableCell>
+                        ) : (
+                          ''
+                        )}
+                        {mode === 'end' && disabled ? (
+                          <StyledTableCell align="center">
+                            {OdooLib.formatDateTime(row.date_finished)}
+                          </StyledTableCell>
+                        ) : (
+                          ''
+                        )}
+                        <StyledTableCell align="center">
+                          {(row.wc_type === 'F' || type === 'anodize') &&
+                          mode === 'end' &&
                           !disabled ? (
-                            <StyledTableCell align="center" />
-                          ) : mode === 'end' &&
-                            row.type !== 'good' &&
-                            ['unracking', 'anodize', 'painting'].includes(
-                              type
-                            ) &&
-                            !disabled ? (
-                            <StyledTableCell align="center" />
+                            <TextField
+                              id="rack"
+                              name="rack"
+                              value={row.rack}
+                              onChange={(e) => {
+                                const ln = [...rows];
+                                const lnr = ln[index];
+                                lnr.rack = e.target.value;
+                                ln[index] = lnr;
+                                setRows(ln);
+                              }}
+                            />
                           ) : (
-                            ''
+                            row.rack
                           )}
-                          <StyledTableCell />
-                          <StyledTableCell />
-                          <StyledTableCell>{x.productSName}</StyledTableCell>
-                          <StyledTableCell />
-                          {mode === 'end' && disabled ? (
-                            <StyledTableCell align="center" />
-                          ) : (
-                            ''
-                          )}
-                          <StyledTableCell />
+                        </StyledTableCell>
+                        <StyledTableCell align="right">
+                          {mode === 'end' ? row.qty : row.qtyNett}
+                        </StyledTableCell>
+                        {mode === 'start' ? (
                           <StyledTableCell align="right">
-                            {x.qtyScrap}
+                            {TextF(index, row.qty)}
                           </StyledTableCell>
+                        ) : (
+                          ''
+                        )}
+                        <StyledTableCell align="center">
+                          {row.type}
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {row.note}
+                        </StyledTableCell>
+                        {(row.type === 'good' &&
+                          mode === 'end' &&
+                          row.note !== 'Roll' &&
+                          !disabled) ||
+                        (mode === 'start' &&
+                          [
+                            'painting',
+                            'anodize',
+                            'unracking',
+                            'preChromate',
+                          ].includes(type) &&
+                          !disabled &&
+                          row.type === 'good') ? (
                           <StyledTableCell align="center">
-                            {x.scrapType}
+                            <Scrap
+                              index={index}
+                              record={{
+                                qty: row.qty,
+                                productid: row.productid,
+                                productname: row.productname,
+                                id: row.id,
+                                output_id: row.output_id,
+                              }}
+                              addScrap={addScrap}
+                              mode={mode}
+                              loading={setLoading}
+                              type={type}
+                            />
                           </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {x.note}
-                          </StyledTableCell>
-                          {disabled ? (
-                            ''
-                          ) : (
-                            <StyledTableCell>
-                              <IconButton
-                                className={classes.iconButton}
-                                aria-label="delete"
-                                onClick={async () => {
-                                  setMsgBox({
-                                    variant: 'success',
-                                    message: '',
-                                  });
-                                  setLoading(true);
-                                  const data = [...rows];
-                                  const rec = { ...data[index] };
-                                  const line = [...rec.lines];
-                                  rec.qty += Number(x.qtyScrap);
-                                  let result = false;
-                                  if (line[idx].scrapId > 0) {
-                                    result = await odoo.addScrapOLine(
-                                      'del',
-                                      'scrap',
-                                      0,
-                                      false,
-                                      Number(x.qtyScrap) + Number(rec.qtyNett),
-                                      rec.id,
-                                      line[idx].scrapId,
-                                      false
-                                    );
-                                    if (!result.faultCode) {
-                                      result = true;
-                                    }
-                                  } else {
-                                    result = true;
-                                  }
-                                  if (result) {
-                                    line.splice(idx, 1);
-                                    rec.lines = line;
-                                    data[index] = rec;
-                                    console.log(data[index]);
-                                    setRows(data);
-                                  } else {
-                                    setMsgBox({
-                                      variant: 'error',
-                                      message: result.message,
-                                    });
-                                  }
-                                  setLoading(false);
-                                }}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </StyledTableCell>
-                          )}
-                        </StyledTableRow>
-                      ))
-                    : ''}
-                </>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                        ) : (
+                          ''
+                        )}
+                      </StyledTableRow>
+                      {row.lines
+                        ? row.lines.map((x, idx) => (
+                            <StyledTableRow>
+                              {mode === 'end' &&
+                              row.type === 'good' &&
+                              ['unracking', 'anodize', 'painting'].includes(
+                                type
+                              ) &&
+                              !disabled ? (
+                                <StyledTableCell align="center" />
+                              ) : mode === 'end' &&
+                                row.type !== 'good' &&
+                                ['unracking', 'anodize', 'painting'].includes(
+                                  type
+                                ) &&
+                                !disabled ? (
+                                <StyledTableCell align="center" />
+                              ) : (
+                                ''
+                              )}
+                              <StyledTableCell />
+                              <StyledTableCell />
+                              <StyledTableCell>
+                                {x.productSName}
+                              </StyledTableCell>
+                              <StyledTableCell />
+                              {mode === 'end' && disabled ? (
+                                <StyledTableCell align="center" />
+                              ) : (
+                                ''
+                              )}
+                              <StyledTableCell />
+                              <StyledTableCell align="right">
+                                {x.qtyScrap}
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                {x.scrapType}
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                {x.note}
+                              </StyledTableCell>
+                              {disabled ? (
+                                ''
+                              ) : (
+                                <StyledTableCell>
+                                  <IconButton
+                                    className={classes.iconButton}
+                                    aria-label="delete"
+                                    onClick={async () => {
+                                      setMsgBox({
+                                        variant: 'success',
+                                        message: '',
+                                      });
+                                      setLoading(true);
+                                      const data = [...rows];
+                                      const rec = { ...data[index] };
+                                      const line = [...rec.lines];
+                                      rec.qty += Number(x.qtyScrap);
+                                      let result = false;
+                                      if (line[idx].scrapId > 0) {
+                                        result = await odoo.addScrapOLine(
+                                          'del',
+                                          'scrap',
+                                          0,
+                                          false,
+                                          Number(x.qtyScrap) +
+                                            Number(rec.qtyNett),
+                                          rec.id,
+                                          line[idx].scrapId,
+                                          false
+                                        );
+                                        if (!result.faultCode) {
+                                          result = true;
+                                        }
+                                      } else {
+                                        result = true;
+                                      }
+                                      if (result) {
+                                        line.splice(idx, 1);
+                                        rec.lines = line;
+                                        data[index] = rec;
+                                        console.log(data[index]);
+                                        setRows(data);
+                                      } else {
+                                        setMsgBox({
+                                          variant: 'error',
+                                          message: result.message,
+                                        });
+                                      }
+                                      setLoading(false);
+                                    }}
+                                  >
+                                    <DeleteIcon />
+                                  </IconButton>
+                                </StyledTableCell>
+                              )}
+                            </StyledTableRow>
+                          ))
+                        : ''}
+                    </>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+      </Grid>
 
       <Grid container spacing={3}>
         <Grid item xs={3} md={3} sm={3}>
@@ -629,9 +745,13 @@ const ListPalletOvenRackingUnrackingPage = ({
             {disabled || rows.length === 0 ? (
               ''
             ) : mode === 'start' ? (
-              <Button onClick={(e) => setInwork(e)}>Start</Button>
+              <Button variant="contained" onClick={(e) => setInwork(e)}>
+                Start
+              </Button>
             ) : mode === 'end' ? (
-              <Button onClick={actionDone}>Finished</Button>
+              <Button variant="contained" onClick={actionDone}>
+                Finished
+              </Button>
             ) : (
               ''
             )}

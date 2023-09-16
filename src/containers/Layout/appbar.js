@@ -1,16 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import AppBar from '@material-ui/core/AppBar/AppBar';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Router, { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 import Link from 'next/link';
+import MenuIcon from '@material-ui/icons/Menu';
+import Divider from '@material-ui/core/Divider';
+import OdooLib from '../../models/odoo';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -21,13 +26,82 @@ const useStyles = makeStyles(() => ({
     flexGrow: 1,
     align: 'center',
   },
+  titleColor: {
+    fontSize: 30,
+    background: '-webkit-linear-gradient(25deg, #0000FF 10%, #008000 50%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    fontWeight: 800,
+  },
 }));
 
-const AppbarSection = ({ title }) => {
+const StyledMenu = withStyles({
+  paper: {
+    border: '1px solid #d3d4d5',
+  },
+})((props) => (
+  <Menu
+    elevation={0}
+    getContentAnchorEl={null}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'center',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'center',
+    }}
+    {...props}
+  />
+));
+
+const StyledMenuItem = withStyles((theme) => ({
+  root: {
+    '&:focus': {
+      backgroundColor: theme.palette.primary.main,
+      '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+        color: theme.palette.common.white,
+      },
+    },
+  },
+}))(MenuItem);
+
+const AppbarSection = ({ title, setMsgBox }) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [openMenu, setOpenMenu] = useState(null);
+  const odoo = new OdooLib();
   const router = useRouter();
   const open = Boolean(anchorEl);
+  const uid = localStorage.getItem('uid');
+  const [menu, addMenu] = React.useState([]);
+
+  const getMenu = async () => {
+    const dashboard = await odoo.getAccessUser(uid);
+    const data = [];
+    try {
+      dashboard.forEach((item) => {
+        data.sort().push(item);
+      });
+      addMenu(data);
+    } catch (e) {
+      setMsgBox({ variant: 'error', message: e.message });
+    }
+  };
+
+  useEffect(() => {
+    if (Boolean(openMenu) === true) {
+      getMenu();
+    }
+  }, [openMenu]);
+
+  const clickMenu = (event) => {
+    setOpenMenu(event.currentTarget);
+  };
+
+  const closeMenu = () => {
+    setOpenMenu(null);
+  };
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -121,6 +195,56 @@ const AppbarSection = ({ title }) => {
   return (
     <AppBar position="sticky">
       <Toolbar>
+        {router.pathname === '/' && (
+          <IconButton
+            edge="start"
+            className={classes.menuButton}
+            color="inherit"
+            aria-label="open drawer"
+          >
+            <MenuIcon onClick={(e) => clickMenu(e)} />
+            <StyledMenu
+              id="customized-menu"
+              anchorEl={openMenu}
+              keepMounted
+              open={Boolean(openMenu)}
+              onClose={closeMenu}
+            >
+              {menu.map((menuItem) => (
+                <>
+                  <Link href={`${menuItem.comment}`}>
+                    <StyledMenuItem onClick={closeMenu}>
+                      <ListItemIcon>
+                        <img
+                          src={`/static/${
+                            menuItem.name
+                              .toLowerCase()
+                              .replace(' ', '')
+                              .split('.')[1]
+                          }.png`}
+                          width={35}
+                          height={30}
+                          alt={menuItem.name.replace(' ', '').split('.')[1]}
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Typography
+                            variant="body2"
+                            style={{ color: '#00BFFF', fontWeight: 800 }}
+                          >
+                            {menuItem.name.split('.')[1]}
+                          </Typography>
+                        }
+                      />
+                    </StyledMenuItem>
+                  </Link>
+                  <Divider />
+                </>
+              ))}
+            </StyledMenu>
+          </IconButton>
+        )}
         {router.pathname !== '/' && (
           <IconButton
             edge="start"
@@ -143,7 +267,7 @@ const AppbarSection = ({ title }) => {
             className={classes.title}
             style={{ cursor: 'pointer' }}
           >
-            <a>Odoo</a>
+            <a className={classes.titleColor}>ALUBLESS</a>
           </Typography>
         </Link>
         <div className={classes.labelSPB}>
@@ -196,4 +320,5 @@ AppbarSection.defaultProps = {
 
 AppbarSection.propTypes = {
   title: PropTypes.string,
+  setMsgBox: PropTypes.func.isRequired,
 };

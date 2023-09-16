@@ -137,7 +137,7 @@ const SearchMeltingPage = ({ setTitle, setLoading }) => {
   return (
     <>
       <Head>
-        <title>Odoo App</title>
+        <title>ALUBLESS</title>
       </Head>
 
       <AppBar position="static">

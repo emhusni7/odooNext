@@ -137,7 +137,7 @@ const InvReport = ({ setTitle, setMsgBox, setLoading }) => {
   return (
     <>
       <Head>
-        <title>Odoo App</title>
+        <title>ALUBLESS</title>
       </Head>
 
       <div className={classes.root}>

@@ -86,7 +86,7 @@ const SearchRackPage = ({ setTitle }) => {
   return (
     <>
       <Head>
-        <title>Odoo App</title>
+        <title>ALUBLESS</title>
       </Head>
       <Box className={classes.root}>
         <Paper component="form" className={classes.paper}>
@@ -112,6 +112,7 @@ const SearchRackPage = ({ setTitle }) => {
                 <Box className={classes.wrapper}>
                   <Button
                     type="submit"
+                    variant="contained"
                     className={classes.button}
                     disabled={loading}
                   >

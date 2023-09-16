@@ -2,10 +2,6 @@
   "name": "odoo-pwa",
   "version": "1.2.0",
   "description": "Purchasing Barcode odoo",
-  "repository": {
-    "type": "git",
-    "url": "git@gitlab.com:bizoft/odoo-pwa.git"
-  },
   "main": "index.js",
   "scripts": {
     "dev": "next",
@@ -16,7 +12,7 @@
     "lint:js": "eslint . --ext .js,.jsx",
     "lint:js:fix": "npm run lint:js -- --fix"
   },
-  "author": "Bizoft Enterprise (MIT)",
+  "author": "BMSA",
   "license": "ISC",
   "dependencies": {
     "@material-ui/core": "4.9.10",

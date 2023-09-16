@@ -208,7 +208,8 @@ const ConsumePage = ({ setTitle, setLoading, setMsgBox }) => {
             message: `${dt.name} Quantity not available `,
             variant: 'error',
             status: true,
-          }));
+          })
+        );
       } else {
         setPicking((prevState) => ({
           ...prevState,
@@ -337,9 +338,9 @@ const ConsumePage = ({ setTitle, setLoading, setMsgBox }) => {
                     new Promise((resolve, reject) => {
                       resolve();
                       if (
-                        !newData.qty
-                        || newData.qty === 0
-                        || !newData.product
+                        !newData.qty ||
+                        newData.qty === 0 ||
+                        !newData.product
                       ) {
                         return reject();
                       }
@@ -367,7 +368,7 @@ const ConsumePage = ({ setTitle, setLoading, setMsgBox }) => {
   return (
     <>
       <Head>
-        <title>Odoo App - Pemakaian</title>
+        <title>ALUBLESS - Pemakaian</title>
       </Head>
       <div className={classes.root}>
         <>
@@ -431,7 +432,8 @@ const ConsumePage = ({ setTitle, setLoading, setMsgBox }) => {
                   setPicking({
                     ...picking,
                     sourceDocument: e.target.value,
-                  })}
+                  })
+                }
                 variant="outlined"
                 // value={picking.name}
                 // disabled

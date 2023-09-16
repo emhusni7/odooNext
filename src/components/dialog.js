@@ -27,8 +27,10 @@ const AlertDialog = ({ title, message, open, handleClose, process }) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleProcess} autoFocus>
+          <Button variant="outlined" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleProcess} autoFocus>
             Ok
           </Button>
         </DialogActions>

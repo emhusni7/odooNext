@@ -333,9 +333,13 @@ const ListQcPage = ({ setTitle, setMsgBox, setLoading }) => {
         <Grid item xs={3} md={3} sm={3}>
           <Paper className={classes.paperButton} elevation={0}>
             {!disabled ? (
-              <Button onClick={process}>Process</Button>
+              <Button variant="outlined" onClick={process}>
+                Process
+              </Button>
             ) : !done ? (
-              <Button onClick={validate}>Validate</Button>
+              <Button variant="contained" onClick={validate}>
+                Validate
+              </Button>
             ) : (
               ''
             )}

@@ -595,6 +595,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
               </Grid>
               <Grid item xs={4} md={4} sm={12}>
                 <Button
+                  variant="contained"
                   className={classes.button}
                   disabled={disable}
                   onClick={() => addPackingConsume()}
@@ -732,6 +733,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                   </Grid>
                   <Grid item xs={4} md={4} sm={4}>
                     <Button
+                      variant="contained"
                       className={classes.button}
                       disabled={disable}
                       onClick={() => addPacking()}
@@ -840,6 +842,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                         TotalConsume < Total
                       }
                       type="button"
+                      variant="contained"
                       onClick={() => handleSubmit()}
                     >
                       Print Saved

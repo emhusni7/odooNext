@@ -879,6 +879,7 @@ export default class OdooLib {
         press.dieId,
         press.lotBillet,
         press.note,
+        press.dateEnd,
       ]);
       return result;
     } catch (e) {
@@ -918,7 +919,16 @@ export default class OdooLib {
     }
   }
 
-  async createPress(woId, mchID, wcId, shiftId, dieId, lotBillet, note) {
+  async createPress(
+    woId,
+    mchID,
+    wcId,
+    shiftId,
+    dieId,
+    lotBillet,
+    note,
+    dateStart
+  ) {
     try {
       const output = await this.executeKW(
         'mrp.production.output',
@@ -934,6 +944,7 @@ export default class OdooLib {
           lotBillet,
           dieId,
           localStorage.getItem('spvId'),
+          dateStart,
         ]
       );
       return output;
@@ -1213,7 +1224,7 @@ export default class OdooLib {
     }
   }
 
-  async actionDone(data, scrapbs, racks) {
+  async actionDone(data, scrapbs, racks, date) {
     try {
       const result = await this.executeKW('mrp.production.output', 'outDone', [
         data,
@@ -1221,6 +1232,7 @@ export default class OdooLib {
         localStorage.getItem('shiftId'),
         scrapbs,
         racks,
+        date,
       ]);
       return result;
     } catch (e) {
@@ -2554,6 +2566,35 @@ export default class OdooLib {
     const day = `0${dt.getDate()}`.slice(-2);
     const hours = `0${dt.getHours()}`.slice(-2);
     const minutes = `0${dt.getMinutes()}`.slice(-2);
-    return `${[day, mnth, dt.getFullYear()].join('-')} ${hours}:${minutes}`;
+    return `${[dt.getFullYear(), mnth, day].join('-')}T${hours}:${minutes}`;
+  }
+
+  static OdooDateTime(str) {
+    const dt = new Date(str);
+    dt.setHours(dt.getHours() - 7);
+    const mnth = `0${dt.getMonth() + 1}`.slice(-2);
+    const day = `0${dt.getDate()}`.slice(-2);
+    const hours = `0${dt.getHours()}`.slice(-2);
+    const minutes = `0${dt.getMinutes()}`.slice(-2);
+    return `${[dt.getFullYear(), mnth, day].join('-')}T${hours}:${minutes}`;
+  }
+
+  static CurrentTime(str) {
+    const dt = new Date(str);
+    dt.setHours(dt.getHours());
+    const mnth = `0${dt.getMonth() + 1}`.slice(-2);
+    const day = `0${dt.getDate()}`.slice(-2);
+    const hours = `0${dt.getHours()}`.slice(-2);
+    const minutes = `0${dt.getMinutes()}`.slice(-2);
+    return `${[dt.getFullYear(), mnth, day].join('-')}T${hours}:${minutes}`;
+  }
+
+  static MinDateTime(str) {
+    const dt = new Date(str);
+    dt.setDate(dt.getDate() - 1);
+    const mnth = `0${dt.getMonth() + 1}`.slice(-2);
+    const day = `0${dt.getDate()}`.slice(-2);
+
+    return `${[dt.getFullYear(), mnth, day].join('-')}T00:00`;
   }
 }

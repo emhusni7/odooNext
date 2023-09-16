@@ -6,6 +6,7 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
+// eslint-disable-next-line no-unused-vars
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Head from 'next/dist/next-server/lib/head';
@@ -19,6 +20,13 @@ const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
+  titleColor: {
+    fontSize: 30,
+    background: '-webkit-linear-gradient(25deg, #0000FF 10%, #008000 50%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    fontWeight: 800,
+  },
   outlineBtnStyle: {
     minWidth: ['60px', '80px', '100px', '120px', '156px'],
     fontSize: ['10px', '12px', '14px'],
@@ -28,10 +36,10 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 10,
   },
   btnStyle: {
-    minWidth: ['60px', '80px', '100px', '120px', '156px'],
-    fontSize: ['10px', '12px', '14px'],
-    fontWeight: '500',
-    marginTop: theme.spacing(2),
+    // minWidth: ['60px', '80px', '100px', '120px', '156px'],
+    // fontSize: ['10px', '12px', '14px'],
+    // fontWeight: '500',
+    // marginTop: theme.spacing(2),
   },
   paper: {
     padding: theme.spacing(2),
@@ -98,7 +106,7 @@ const Login = () => {
   return (
     <>
       <Head>
-        <title>Odoo App - Login</title>
+        <title>ALUBLESS - Login</title>
       </Head>
       <Fade in>
         <Box className={classes.root}>
@@ -107,13 +115,13 @@ const Login = () => {
               <Box className="row">
                 <Box className="col">
                   <Box>
-                    <Typography variant="h5" component="h5">
-                      Odoo App
+                    <Typography className={classes.titleColor}>
+                      ALUBLESS
                     </Typography>
                   </Box>
 
                   <Box style={{ marginTop: '20px', marginBottom: '10px' }}>
-                    Please login with your Odoo account.
+                    Please login with your account.
                   </Box>
 
                   <Box>
@@ -147,10 +155,10 @@ const Login = () => {
                     />
                   </Box>
 
-                  <Box className={classes.wrapper}>
+                  <Box style={{ display: 'flex', padding: '5px' }}>
                     <Button
-                      className={classes.btnStyle}
-                      fullWidth
+                      variant="contained"
+                      style={{ backgroundColor: 'blue' }}
                       type="submit"
                       disabled={loading}
                     >
@@ -168,17 +176,13 @@ const Login = () => {
                         variant={msgBox.variant}
                       />
                     )}
-
-                    <Typography
-                      color="secondary"
-                      type="body1"
-                      className={classes.outlineBtnStyle}
-                      align="center"
-                    >
-                      <Link href="/settings" under>
+                    <Link href="/settings">
+                      <Button variant="outlined">Setting</Button>
+                    </Link>
+                    {/* 
+                    <Link href="/settings">
                         Settings
-                      </Link>
-                    </Typography>
+                      </Link> */}
                   </Box>
                 </Box>
               </Box>

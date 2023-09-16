@@ -134,7 +134,7 @@ const SearchCorrPage = ({ setTitle, setLoading }) => {
   return (
     <>
       <Head>
-        <title>Odoo App</title>
+        <title>ALUBLESS</title>
       </Head>
 
       <AppBar position="static">

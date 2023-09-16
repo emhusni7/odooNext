@@ -67,19 +67,14 @@ const Settings = () => {
             <Box className="row">
               <Box className="col">
                 <Box>
-                  <Typography variant="h5" component="h5" align="center">
-                    Odoo Settings
+                  <Typography
+                    variant="h5"
+                    component="h5"
+                    style={{ fontWeight: 500 }}
+                    align="center"
+                  >
+                    Settings
                   </Typography>
-                </Box>
-
-                <Box
-                  style={{
-                    marginTop: '20px',
-                    marginBottom: '10px',
-                    textAlign: 'center',
-                  }}
-                >
-                  Please type for your settings.
                 </Box>
 
                 <Box>
@@ -131,7 +126,11 @@ const Settings = () => {
 
                 <Box>
                   {/* {state.errCode===0&&( */}
-                  <Button className={classes.btnStyle} fullWidth type="submit">
+                  <Button
+                    className={classes.btnStyle}
+                    variant="contained"
+                    type="submit"
+                  >
                     SAVE
                   </Button>
                   {/* )} */}
@@ -140,7 +139,7 @@ const Settings = () => {
                   <Link href="/login">
                     <Button
                       className={classes.btnStyle}
-                      fullWidth
+                      variant="outlined"
                       type="submit"
                       href="/login"
                     >

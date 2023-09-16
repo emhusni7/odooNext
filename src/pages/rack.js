@@ -130,7 +130,7 @@ const RackPage = ({ setTitle, setMsgBox, setLoading }) => {
   return (
     <>
       <Head>
-        <title>Odoo App - List Rack</title>
+        <title>ALUBLESS - List Rack</title>
       </Head>
       <>
         <TableContainer component={Paper} className={classes.table}>
@@ -243,6 +243,7 @@ const RackPage = ({ setTitle, setMsgBox, setLoading }) => {
               {disable === false ? (
                 <Button
                   className={classes.button}
+                  variant="contained"
                   onClick={(e) => process(e)}
                   disabled={disable}
                 >

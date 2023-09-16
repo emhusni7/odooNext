@@ -149,7 +149,11 @@ const DieDetailPage = ({ setTitle, setLoading, setMsgBox }) => {
     buttons = <Button onClick={() => onStart(die)}>Start</Button>;
   } else if (die.status === 'InProgress') {
     buttons = (
-      <Button onClick={() => setDone()} className={classes.buttonEnd}>
+      <Button
+        variant="contained"
+        onClick={() => setDone()}
+        className={classes.buttonEnd}
+      >
         End
       </Button>
     );
@@ -158,7 +162,7 @@ const DieDetailPage = ({ setTitle, setLoading, setMsgBox }) => {
   return (
     <>
       <Head>
-        <title>Odoo App - Detail Die Machine</title>
+        <title>ALUBLESS - Detail Die Machine</title>
       </Head>
 
       <div className={classes.root}>

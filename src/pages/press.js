@@ -35,7 +35,7 @@ import OdooLib from '../models/odoo';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: '#722076',
+    backgroundColor: '#0b4be0',
     color: theme.palette.common.white,
   },
   body: {
@@ -158,10 +158,12 @@ const useStyles = makeStyles({
 const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
   const router = useRouter();
   const odoo = new OdooLib();
-
+  const minDate = OdooLib.MinDateTime(new Date().toISOString());
+  const maxDate = OdooLib.CurrentTime(new Date().toISOString());
   const shiftId = Number(localStorage.getItem('shiftId'));
   const shiftName = localStorage.getItem('shiftName');
   const { woId, productionId } = router.query;
+  const mchID = Number(localStorage.getItem('pressMchId'));
   const [press, setPress] = React.useState({
     id: '',
     shiftId,
@@ -213,12 +215,16 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
         message: 'Press Belum di Recalculate',
       });
     } else {
-      const produce = await odoo.endPress(press);
+      const produce = await odoo.endPress({
+        ...press,
+        mchID,
+        dateEnd: OdooLib.OdooDateTime(press.dateEnd),
+      });
       if (!produce.faultCode) {
         setPress({
           ...press,
           status: 'Done',
-          dateEnd: produce.date_finished,
+          dateEnd: OdooLib.formatDateTime(produce.date_finished),
           weight_std: produce.total_std_weight,
           weight_act: produce.total_act_weight,
           under_weight: produce.uo_weight,
@@ -287,18 +293,27 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
 
     const moveLines = await odoo.createPress(
       Number(woId),
-      press.mchID,
+      mchID,
       press.wcId,
       press.shiftId,
       press.dieId,
       press.lotBillet,
-      press.note
+      press.note,
+      OdooLib.OdooDateTime(press.dateStart)
     );
     if (!moveLines.faultCode) {
-      setPress((prevState) => ({
-        ...prevState,
+      const dtCons3 = moveLines.consume.map((x) => {
+        return { ...x, date: press.dateStart };
+      });
+      setPress({
         ...moveLines,
-      }));
+        dateStart: press.dateStart,
+        // eslint-disable-next-line no-nested-ternary
+        dateEnd: press.dateEnd
+          ? OdooLib.formatDateTime(press.dateEnd)
+          : OdooLib.CurrentTime(new Date().toISOString()),
+        consume: dtCons3,
+      });
     } else {
       setLoading(false);
       setMsgBox({ variant: 'error', message: moveLines.message });
@@ -331,12 +346,13 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
   const addBillet = async () => {
     setMsgBox({ variant: 'success', message: '' });
     const res = await odoo.addBillet(press.outputId);
+    const result = { ...res, date: press.dateStart };
     if (res.faultCode) {
       setMsgBox({ variant: 'error', message: res.message });
     } else {
       setPress((prev) => ({
         ...prev,
-        consume: [...prev.consume, res],
+        consume: [...prev.consume, result],
         billetSaved: false,
       }));
     }
@@ -371,19 +387,28 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
   const saveBillet = async () => {
     setMsgBox({ variant: 'success', message: '' });
     setLoading(true);
+    const dtCons = press.consume.filter(
+      (x) => x.saved === false && x.btg * x.length > 0
+    );
     const result = await odoo.saveBillet(
       press.outputId,
       press.moname,
-      press.dateStart,
+      dtCons
+        ? OdooLib.OdooDateTime(dtCons[0].date)
+        : OdooLib.OdooDateTime(press.dateStart),
       productionId,
-      press.consume.filter((x) => x.saved === false && x.btg * x.length > 0)
+      dtCons
     );
     if (!result.faultCode) {
       setMsgBox({ variant: 'success', message: 'Data Has Been Saved' });
-      setPress((prevState) => ({
-        ...prevState,
-        ...result,
-      }));
+      const dtCons2 = press.consume.map((x) => {
+        return { ...x, date: x.date };
+      });
+      setPress({
+        ...press,
+        consume: dtCons2,
+        billetSaved: result.billetSaved,
+      });
     } else {
       setMsgBox({ variant: 'error', message: result.faultString });
     }
@@ -418,7 +443,30 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
   const getWo = async () => {
     setLoading(true);
     const woOrder = await odoo.getWorkOrder(woId);
-    setPress((prevState) => ({ ...prevState, ...woOrder }));
+    const arrCons = woOrder.consume
+      ? woOrder.consume.map((x) => {
+          return {
+            ...x,
+            date: x.date
+              ? OdooLib.formatDateTime(x.date)
+              : OdooLib.formatDateTime(woOrder.dateStart),
+          };
+        })
+      : [];
+
+    setPress({
+      ...woOrder,
+      dateStart: woOrder.dateStart
+        ? OdooLib.formatDateTime(woOrder.dateStart)
+        : OdooLib.CurrentTime(new Date().toISOString()),
+      // eslint-disable-next-line no-nested-ternary
+      dateEnd: woOrder.dateEnd
+        ? OdooLib.formatDateTime(woOrder.dateEnd)
+        : woOrder.status !== 'New'
+        ? OdooLib.CurrentTime(new Date().toISOString())
+        : false,
+      consume: arrCons,
+    });
     setLoading(false);
   };
 
@@ -432,6 +480,13 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
   const remConsume = async (idx) => {
     setMsgBox({ variant: 'success', message: '' });
     const res = await odoo.remBillet(press.outputId, idx);
+    const result = res.consume.map((x) => {
+      return {
+        ...x,
+        date: OdooLib.formatDateTime(x.date ? x.date : press.dateStart),
+      };
+    });
+    res.consume = result;
     if (!res.faultCode) {
       setPress((prev) => ({
         ...prev,
@@ -480,7 +535,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
   return (
     <>
       <Head>
-        <title>Odoo App</title>
+        <title>ALUBLESS</title>
       </Head>
 
       <div className={classes.root}>
@@ -489,7 +544,9 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
             <Grid item xs={3} md={3} sm={3}>
               <Paper className={classes.paper} elevation={0}>
                 {press.status === 'New' ? (
-                  <Button onClick={() => inWork()}>Start</Button>
+                  <Button variant="contained" onClick={() => inWork()}>
+                    Start
+                  </Button>
                 ) : (
                   ''
                 )}
@@ -499,7 +556,9 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
             <Grid item xs={3} md={3} sm={3}>
               <Paper className={classes.paper} elevation={0}>
                 {press.status === 'In Progress' ? (
-                  <Button onClick={() => setDone()}>End</Button>
+                  <Button variant="contained" onClick={() => setDone()}>
+                    End
+                  </Button>
                 ) : (
                   ''
                 )}
@@ -526,16 +585,22 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                 <TextField
                   id="dateStart"
                   label="Start Date"
-                  value={
-                    press.dateStart
-                      ? OdooLib.formatDateTime(press.dateStart)
-                      : ''
-                  }
+                  type="datetime-local"
+                  value={press.dateStart ? press.dateStart : ''}
+                  onChange={(e) => {
+                    setPress({ ...press, dateStart: e.target.value });
+                  }}
                   className={classes.textField}
                   InputLabelProps={{
                     shrink: true,
                   }}
-                  disabled
+                  InputProps={{
+                    readOnly: press.status === 'Done',
+                    inputProps: {
+                      min: minDate,
+                      max: maxDate,
+                    },
+                  }}
                 />
               </Paper>
             </Grid>
@@ -550,7 +615,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                   className={classes.textField}
                   value={press.moname}
                   InputLabelProps={{ shrink: true }}
-                  disabled
+                  InputProps={{ readOnly: true }}
                 />
               </Paper>
             </Grid>
@@ -560,14 +625,25 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                 <TextField
                   id="dateFinish"
                   label="End Date"
-                  value={
-                    press.dateEnd ? OdooLib.formatDateTime(press.dateEnd) : ''
-                  }
+                  type="datetime-local"
+                  value={press.dateEnd ? press.dateEnd : ''}
+                  onChange={(e) => {
+                    setPress({
+                      ...press,
+                      dateEnd: e.target.value,
+                    });
+                  }}
                   className={classes.textField}
                   InputLabelProps={{
                     shrink: true,
                   }}
-                  disabled
+                  InputProps={{
+                    readOnly: press.status !== 'In Progress',
+                    inputProps: {
+                      min: minDate,
+                      max: maxDate,
+                    },
+                  }}
                 />
               </Paper>
             </Grid>
@@ -692,6 +768,9 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                         <StyledTableCell align="center">
                           Location
                         </StyledTableCell>
+                        <StyledTableCell align="center">
+                          Date Consume
+                        </StyledTableCell>
                         <StyledTableCell align="center">Lot</StyledTableCell>
                         <StyledTableCell align="center">Length</StyledTableCell>
                         <StyledTableCell align="center">Batang</StyledTableCell>
@@ -717,6 +796,30 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                                 scope="row"
                               >
                                 {row.location}
+                              </StyledTableCell>
+                              <StyledTableCell align="left">
+                                <TextField
+                                  id="date"
+                                  type="datetime-local"
+                                  defaultValue={row.date}
+                                  value={row.date}
+                                  onChange={(e) => {
+                                    const dtCons = press.consume;
+                                    const consIdx = press.consume[index];
+                                    consIdx.date = e.target.value;
+                                    dtCons[index] = consIdx;
+                                    setPress({
+                                      ...press,
+                                      consume: dtCons,
+                                    });
+                                  }}
+                                  InputLabelProps={{
+                                    shrink: true,
+                                  }}
+                                  InputProps={{
+                                    readOnly: row.saved || press.billetSaved,
+                                  }}
+                                />
                               </StyledTableCell>
                               <StyledTableCell align="left">
                                 <Autocomplete
@@ -762,7 +865,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                                       });
                                     }
                                   }}
-                                  disabled={row.saved}
+                                  disabled={row.saved || press.billetSaved}
                                   getOptionSelected={(option, val) =>
                                     option.name === val.name
                                   }
@@ -809,7 +912,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                                   InputProps={{
                                     classes: { input: classes.inputTable },
                                   }}
-                                  disabled={row.saved}
+                                  disabled={row.saved || press.billetSaved}
                                   value={row.length}
                                   onChange={(e) => {
                                     const newData = press.consume;
@@ -853,7 +956,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                                       consume: newData,
                                     }));
                                   }}
-                                  disabled={row.saved}
+                                  disabled={row.saved || press.billetSaved}
                                 >
                                   <RemoveIcon />
                                 </Fab>
@@ -863,7 +966,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                                   name="btg"
                                   variant="outlined"
                                   value={row.btg}
-                                  disabled={row.saved}
+                                  disabled={row.saved || press.billetSaved}
                                   InputProps={{
                                     classes: { input: classes.inputTable },
                                   }}
@@ -895,7 +998,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                                   size="small"
                                   className={classes.buttonPlus}
                                   aria-label="add"
-                                  disabled={row.saved}
+                                  disabled={row.saved || press.billetSaved}
                                   onClick={() => {
                                     const newData = press.consume;
 
@@ -932,7 +1035,8 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                                 component="a"
                                 scope="row"
                               >
-                                {row.saved && press.status === 'In Progress'
+                                {(row.saved || press.billetSaved) &&
+                                press.status === 'In Progress'
                                   ? delBil(row.id)
                                   : ''}
                               </StyledTableCell>
@@ -945,7 +1049,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                 {press.status === 'In Progress' ? (
                   <Grid container spacing={3} justify="flex-end">
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       color="primary"
                       className={classes.buttonSaveTab}
                       onClick={() => {
@@ -956,6 +1060,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                       Add Billet
                     </Button>
                     <Button
+                      variant="contained"
                       disabled={press.billetSaved}
                       onClick={() => {
                         saveBillet();
@@ -1211,8 +1316,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                 {press.status === 'In Progress' ? (
                   <Grid container spacing={3} justify="flex-end">
                     <Button
-                      variant="outlined"
-                      color="primary"
+                      variant="contained"
                       className={classes.buttonSaveTab}
                       disabled={
                         press.produce.findIndex(
@@ -1226,8 +1330,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                       Add Batt Scrap
                     </Button>
                     <Button
-                      variant="outlined"
-                      color="primary"
+                      variant="contained"
                       className={classes.buttonSaveTab}
                       disabled={
                         press.produce.findIndex((x) => x.note === 'Roll') > -1
@@ -1240,8 +1343,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                     </Button>
 
                     <Button
-                      variant="outlined"
-                      color="primary"
+                      variant="contained"
                       className={classes.buttonSaveTab}
                       onClick={() => {
                         saveProduce();
@@ -1307,6 +1409,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
 
                 <Grid container spacing={2}>
                   <Button
+                    variant="contained"
                     className={classes.buttonSaveTab}
                     onClick={() =>
                       saveCorr(press.dieId, press.outputId, press.problem)
@@ -1328,6 +1431,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                 >
                   {press.status === 'In Progress' ? (
                     <Button
+                      variant="contained"
                       className={classes.buttonHover}
                       onClick={() => {
                         recalculate();

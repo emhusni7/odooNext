@@ -221,7 +221,11 @@ const ScanPalletOvenRackingUnrackingPage = ({
                 </TableContainer>
               </Box>
               <Box className={classes.wrapper}>
-                <Button style={{ marginTop: '20px' }} onClick={getProcess}>
+                <Button
+                  variant="contained"
+                  style={{ marginTop: '20px' }}
+                  onClick={getProcess}
+                >
                   Process
                 </Button>
               </Box>

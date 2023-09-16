@@ -122,7 +122,7 @@ const BpbPage = ({ setTitle, setLoading, setMsgBox }) => {
   return (
     <>
       <Head>
-        <title>Odoo App</title>
+        <title>ALUBLESS</title>
       </Head>
       <Box className="row">
         <Paper

@@ -109,6 +109,7 @@ const StartEndOvenRackingUnrackingPage = ({ setTitle }) => {
               <Box className={classes.wrapper}>
                 <Button
                   className={classes.button}
+                  variant="contained"
                   onClick={() =>
                     route.push({
                       pathname: '/inputPalletOvenRackingUnracking',
@@ -123,6 +124,7 @@ const StartEndOvenRackingUnrackingPage = ({ setTitle }) => {
                 </Button>
                 <Button
                   className={classes.button}
+                  variant="contained"
                   onClick={() =>
                     route.push({
                       pathname: '/inputPalletOvenRackingUnracking',

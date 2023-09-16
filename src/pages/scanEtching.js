@@ -31,7 +31,7 @@ const ScanPressPage = ({ setTitle }) => {
   return (
     <>
       <Head>
-        <title>Odoo App - Scanning MO</title>
+        <title>ALUBLESS - Scanning MO</title>
       </Head>
       <Box className="row">
         <QrReader

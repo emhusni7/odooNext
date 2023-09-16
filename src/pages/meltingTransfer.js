@@ -504,7 +504,7 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
   return (
     <>
       <Head>
-        <title>Odoo App - Pemakaian</title>
+        <title>ALUBLESS - Pemakaian</title>
       </Head>
       <div className={classes.root}>
         <>

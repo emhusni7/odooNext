@@ -458,7 +458,7 @@ const InternalTransferPage = ({ setTitle, setLoading, setMsgBox }) => {
   return (
     <>
       <Head>
-        <title>Odoo App - Pemakaian</title>
+        <title>ALUBLESS - Pemakaian</title>
       </Head>
       <div className={classes.root}>
         <>
