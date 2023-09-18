@@ -5,7 +5,7 @@ import Head from 'next/dist/next-server/lib/head';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-
+import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
 import OdooLib from '../models/odoo';
@@ -43,7 +43,8 @@ const DieDetailPage = ({ setTitle, setLoading, setMsgBox }) => {
     wcId,
   } = router.query;
   const odoo = new OdooLib();
-
+  const minDate = OdooLib.MinDateTime(new Date().toISOString());
+  const maxDate = OdooLib.CurrentTime(new Date().toISOString());
   const [die, setDie] = React.useState({
     dieId: Number(prodID),
     woId: Number(id),
@@ -59,26 +60,37 @@ const DieDetailPage = ({ setTitle, setLoading, setMsgBox }) => {
   setTitle(die.name);
 
   const setDone = async () => {
-    setMsgBox({ variant: 'success', message: '' });
-    setLoading(true);
-    const result = await odoo.setDoneDie(die.id);
-    const statusDies = await odoo.dieState(prodID);
-    try {
-      if (!result.faultCode) {
-        setDie({
-          ...die,
-          statusDie: statusDies,
-          status: 'Finished',
-          dateEnd: OdooLib.formatDateTime(result[0].date_finished),
-        });
-        setLoading(false);
-        setMsgBox({ variant: 'success', message: 'Data Has Been Saved' });
-      } else {
-        setLoading(false);
-        setMsgBox({ variant: 'error', message: result.message });
+    if (die.dateStart > die.dateEnd) {
+      setMsgBox({
+        variant: 'error',
+        message: 'Tanggal Start > dari Tanggal Finished',
+      });
+    } else {
+      setMsgBox({ variant: 'success', message: '' });
+      setLoading(true);
+      const result = await odoo.setDoneDie(
+        die.id,
+        OdooLib.OdooDateTime(die.dateStart),
+        OdooLib.OdooDateTime(die.dateEnd)
+      );
+      const statusDies = await odoo.dieState(prodID);
+      try {
+        if (!result.faultCode) {
+          setDie({
+            ...die,
+            statusDie: statusDies,
+            status: 'Finished',
+            dateEnd: OdooLib.formatDateTime(result[0].date_finished),
+          });
+          setLoading(false);
+          setMsgBox({ variant: 'success', message: 'Data Has Been Saved' });
+        } else {
+          setLoading(false);
+          setMsgBox({ variant: 'error', message: result.message });
+        }
+      } catch (e) {
+        setMsgBox({ variant: 'error', message: e.message });
       }
-    } catch (e) {
-      setMsgBox({ variant: 'error', message: e.message });
     }
   };
 
@@ -119,7 +131,10 @@ const DieDetailPage = ({ setTitle, setLoading, setMsgBox }) => {
 
   const onStart = async () => {
     setLoading(true);
-    const result = await odoo.addProdOutput(die);
+    const result = await odoo.addProdOutput({
+      ...die,
+      dateStart: OdooLib.OdooDateTime(die.dateStart),
+    });
     const statusDies = await odoo.dieState(prodID);
     try {
       if (!result.faultCode) {
@@ -146,15 +161,9 @@ const DieDetailPage = ({ setTitle, setLoading, setMsgBox }) => {
   const classes = useStyles();
   let buttons;
   if (die.status === 'New') {
-    buttons = <Button onClick={() => onStart(die)}>Start</Button>;
-  } else if (die.status === 'InProgress') {
     buttons = (
-      <Button
-        variant="contained"
-        onClick={() => setDone()}
-        className={classes.buttonEnd}
-      >
-        End
+      <Button variant="contained" onClick={() => onStart(die)}>
+        Start
       </Button>
     );
   }
@@ -257,11 +266,31 @@ const DieDetailPage = ({ setTitle, setLoading, setMsgBox }) => {
               </Paper>
             </Grid>
             <Grid item xs={6} md={6} sm={6}>
-              <Paper elevation={0}>
-                <Typography className={classes.label}>
-                  {`: ${die.dateStart}`}
-                </Typography>
-              </Paper>
+              <TextField
+                id="date"
+                label=""
+                type="datetime-local"
+                value={
+                  die.dateStart
+                    ? die.dateStart
+                    : OdooLib.CurrentTime(new Date().toISOString())
+                }
+                onChange={(e) => {
+                  setDie({ ...die, dateStart: e.target.value });
+                }}
+                required
+                className={classes.textField}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                InputProps={{
+                  readOnly: die.status === 'Finished',
+                  inputProps: {
+                    min: minDate,
+                    max: maxDate,
+                  },
+                }}
+              />
             </Grid>
           </Grid>
 
@@ -272,11 +301,47 @@ const DieDetailPage = ({ setTitle, setLoading, setMsgBox }) => {
               </Paper>
             </Grid>
             <Grid item xs={6} md={6} sm={6}>
-              <Paper elevation={0}>
-                <Typography className={classes.label}>
-                  {`: ${die.dateEnd}`}
-                </Typography>
-              </Paper>
+              <TextField
+                id="date"
+                label=""
+                type="datetime-local"
+                value={
+                  die.dateEnd
+                    ? die.dateEnd
+                    : OdooLib.CurrentTime(new Date().toISOString())
+                }
+                onChange={(e) => {
+                  setDie({ ...die, dateEnd: e.target.value });
+                }}
+                required
+                className={classes.textField}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                InputProps={{
+                  readOnly: die.status !== 'InProgress',
+                  inputProps: {
+                    min: minDate,
+                    max: maxDate,
+                  },
+                }}
+              />
+            </Grid>
+          </Grid>
+
+          <Grid container spacing={1}>
+            <Grid item xs={3} md={3} sm={3}>
+              {die.status === 'InProgress' ? (
+                <Button
+                  variant="contained"
+                  onClick={() => setDone()}
+                  className={classes.buttonEnd}
+                >
+                  End
+                </Button>
+              ) : (
+                ''
+              )}
             </Grid>
           </Grid>
         </>

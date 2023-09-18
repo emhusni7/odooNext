@@ -84,3 +84,7 @@ out
 
 
 .firebase
+localhost-key.pem
+localhost.pem
+.gitignore
+.gitignore

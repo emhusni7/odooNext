@@ -268,7 +268,6 @@ const ListPalletOvenRackingUnrackingPage = ({
 
   const actionDone = (e) => {
     e.preventDefault();
-    console.log(e.detail);
     switch (e.detail) {
       case 1:
         if (!date || date < minDate) {

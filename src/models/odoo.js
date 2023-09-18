@@ -178,13 +178,15 @@ export default class OdooLib {
     });
   }
 
-  async setDoneDie(outputID) {
+  async setDoneDie(outputID, dateStart, dateFinished) {
     try {
       await this.executeKW('mrp.production.output', 'write', [
         outputID,
         {
           shift_id: localStorage.getItem('shiftId'),
           manager_id: this.uid,
+          date_start: dateStart.replace('T', ' '),
+          date_finished: dateFinished.replace('T', ' '),
         },
       ]);
       let result = await this.executeKW('mrp.production.output', 'set_done', [
@@ -359,6 +361,7 @@ export default class OdooLib {
             workorder_id: die.woId,
             resource_id: die.machine,
             workcenter_id: die.workCid,
+            date_start: die.dateStart,
             type: 'normal',
             name: '/',
             shift_id: localStorage.getItem('shiftId'),

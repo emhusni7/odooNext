@@ -7,7 +7,7 @@
     "dev": "next",
     "test": "jest",
     "build": "next build",
-    "start": "NODE_ENV=production node server.js",
+    "start": "node server.js",
     "export": "next export",
     "lint:js": "eslint . --ext .js,.jsx",
     "lint:js:fix": "npm run lint:js -- --fix"

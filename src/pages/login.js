@@ -114,7 +114,13 @@ const Login = () => {
             <form onSubmit={handleSubmit}>
               <Box className="row">
                 <Box className="col">
-                  <Box>
+                  <Box style={{ display: 'flex' }}>
+                    <img
+                      src="/static/icons-192.png"
+                      width={70}
+                      height={50}
+                      alt="PT. BERKAT MAKMUR SEJAHTERA ABADI"
+                    />
                     <Typography className={classes.titleColor}>
                       ALUBLESS
                     </Typography>
