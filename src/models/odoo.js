@@ -216,7 +216,6 @@ export default class OdooLib {
         2,
         'code',
       ]);
-      console.log(result);
       return result;
     } catch (e) {
       return e;
@@ -2569,7 +2568,10 @@ export default class OdooLib {
     const day = `0${dt.getDate()}`.slice(-2);
     const hours = `0${dt.getHours()}`.slice(-2);
     const minutes = `0${dt.getMinutes()}`.slice(-2);
-    return `${[dt.getFullYear(), mnth, day].join('-')}T${hours}:${minutes}`;
+    const seconds = `0${dt.getSeconds()}`.slice(-2);
+    return `${[dt.getFullYear(), mnth, day].join(
+      '-'
+    )}T${hours}:${minutes}:${seconds}`;
   }
 
   static OdooDateTime(str) {
@@ -2589,6 +2591,7 @@ export default class OdooLib {
     const day = `0${dt.getDate()}`.slice(-2);
     const hours = `0${dt.getHours()}`.slice(-2);
     const minutes = `0${dt.getMinutes()}`.slice(-2);
+
     return `${[dt.getFullYear(), mnth, day].join('-')}T${hours}:${minutes}`;
   }
 

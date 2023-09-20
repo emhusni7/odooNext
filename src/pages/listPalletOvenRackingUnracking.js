@@ -92,7 +92,7 @@ const ListPalletOvenRackingUnrackingPage = ({
   const [disabled, setDisable] = React.useState(false);
   const minDate = OdooLib.MinDateTime(new Date().toISOString());
   const maxDate = OdooLib.CurrentTime(new Date().toISOString());
-  const [date, setDate] = React.useState(false);
+  const [date, setDate] = React.useState(new Date().toISOString());
 
   const getData = async () => {
     setLoading(true);
@@ -372,8 +372,10 @@ const ListPalletOvenRackingUnrackingPage = ({
               type="datetime-local"
               value={
                 rows.length > 0
-                  ? OdooLib.formatDateTime(rows[0].date_start)
-                  : OdooLib.CurrentTime(new Date().toISOString())
+                  ? rows[0].date_start
+                    ? OdooLib.formatDateTime(rows[0].date_start)
+                    : OdooLib.CurrentTime(date)
+                  : OdooLib.CurrentTime(date)
               }
               onChange={(e) => {
                 const newRows = rows.map((x) => {
@@ -407,8 +409,8 @@ const ListPalletOvenRackingUnrackingPage = ({
                 rows.length > 0
                   ? rows[0].date_finished
                     ? OdooLib.formatDateTime(rows[0].date_finished)
-                    : OdooLib.CurrentTime(new Date().toISOString())
-                  : OdooLib.CurrentTime(new Date().toISOString())
+                    : OdooLib.CurrentTime(date)
+                  : OdooLib.CurrentTime(date)
               }
               onChange={(e) => {
                 const newRows = rows.map((x) => {

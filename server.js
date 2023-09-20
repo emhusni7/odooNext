@@ -2,18 +2,18 @@ const http = require('http');
 const { join } = require('path');
 const { parse } = require('url');
 const next = require('next');
-const fs = require('fs');
+// const fs = require('fs');
 
 const app = next({ dev: process.env.NODE_ENV !== 'production' });
 const handle = app.getRequestHandler();
-const options = {
-  key: fs.readFileSync('localhost-key.pem'),
-  cert: fs.readFileSync('localhost.pem'),
-};
+// const options = {
+//   key: fs.readFileSync('localhost-key.pem'),
+//   cert: fs.readFileSync('localhost.pem'),
+// };
 
 app.prepare().then(() => {
   http
-    .createServer(options, (req, res) => {
+    .createServer((req, res) => {
       const parsedUrl = parse(req.url, true);
       const { pathname } = parsedUrl;
 
