@@ -160,13 +160,12 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
   const odoo = new OdooLib();
   const minDate = OdooLib.MinDateTime(new Date().toISOString());
   const maxDate = OdooLib.CurrentTime(new Date().toISOString());
-  const shiftId = Number(localStorage.getItem('shiftId'));
   const shiftName = localStorage.getItem('shiftName');
   const { woId, productionId } = router.query;
   const mchID = Number(localStorage.getItem('pressMchId'));
   const [press, setPress] = React.useState({
     id: '',
-    shiftId,
+    shiftId: Number(localStorage.getItem('shiftId')),
     machine: localStorage.getItem('pressMchName'),
     mchID: Number(localStorage.getItem('pressMchId')),
     consume: [],
@@ -453,8 +452,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
           };
         })
       : [];
-
-    setPress({
+    const newWo = {
       ...woOrder,
       dateStart: woOrder.dateStart
         ? OdooLib.formatDateTime(woOrder.dateStart)
@@ -466,6 +464,10 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
         ? OdooLib.CurrentTime(new Date().toISOString())
         : false,
       consume: arrCons,
+    };
+    setPress({
+      ...press,
+      ...newWo,
     });
     setLoading(false);
   };
