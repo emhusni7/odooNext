@@ -217,7 +217,7 @@ const ListPalletOvenRackingUnrackingPage = ({
       });
     });
 
-    if (['unracking', 'anodize', 'painting'].includes(type)) {
+    if (['unracking', 'anodize', 'painting', 'racking'].includes(type)) {
       outputIds = rows.filter((x) => x.checked).map((x) => x.output_id);
     } else {
       outputIds = rows.map((x) => x.output_id);
@@ -328,7 +328,13 @@ const ListPalletOvenRackingUnrackingPage = ({
         type="number"
         disabled={
           disabled ||
-          !['anodize', 'unracking', 'preChromate', 'painting'].includes(type)
+          ![
+            'anodize',
+            'unracking',
+            'preChromate',
+            'painting',
+            'racking',
+          ].includes(type)
         }
         value={qty}
         onChange={(e) => changeQty(e, index)}
@@ -444,7 +450,9 @@ const ListPalletOvenRackingUnrackingPage = ({
               <TableHead>
                 <TableRow>
                   {mode === 'end' &&
-                  ['unracking', 'anodize', 'painting'].includes(type) &&
+                  ['unracking', 'anodize', 'painting', 'racking'].includes(
+                    type
+                  ) &&
                   !disabled ? (
                     <StyledTableCell align="center">Check</StyledTableCell>
                   ) : (
@@ -481,6 +489,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                       'anodize',
                       'unracking',
                       'preChromate',
+                      'racking',
                     ].includes(type) &&
                     !disabled) ? (
                     <StyledTableCell align="center">Action</StyledTableCell>
@@ -504,7 +513,12 @@ const ListPalletOvenRackingUnrackingPage = ({
                       <StyledTableRow hover>
                         {mode === 'end' &&
                         row.type === 'good' &&
-                        ['unracking', 'anodize', 'painting'].includes(type) &&
+                        [
+                          'anodize',
+                          'painting',
+                          'racking',
+                          'unracking',
+                        ].includes(type) &&
                         !disabled ? (
                           <StyledTableCell align="center">
                             <Checkbox
@@ -516,15 +530,15 @@ const ListPalletOvenRackingUnrackingPage = ({
                               }}
                               disabled={disabled}
                               value={row.checked}
-                              color="primary"
                               inputProps={{ 'aria-label': 'Check' }}
                             />
                           </StyledTableCell>
                         ) : mode === 'end' &&
                           row.type !== 'good' &&
-                          ['unracking', 'anodize', 'painting'].includes(
-                            type
-                          ) ? (
+                          // eslint-disable-next-line prettier/prettier
+                          ['unracking', 'anodize', 'painting', 'racking']
+                            // eslint-disable-next-line prettier/prettier
+                            .includes(type) ? (
                           <StyledTableCell align="center" />
                         ) : (
                           ''
@@ -609,6 +623,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                             'painting',
                             'anodize',
                             'unracking',
+                            'racking',
                             'preChromate',
                           ].includes(type) &&
                           !disabled &&
@@ -638,14 +653,28 @@ const ListPalletOvenRackingUnrackingPage = ({
                             <StyledTableRow>
                               {mode === 'end' &&
                               row.type === 'good' &&
-                              ['unracking', 'anodize', 'painting'].includes(
+                              // eslint-disable-next-line prettier/prettier
+                              [
+                                'unracking',
+                                'anodize',
+                                'painting',
+                                'racking',
+                              ].includes(
+                                // eslint-disable-next-line prettier/prettier
                                 type
                               ) &&
                               !disabled ? (
                                 <StyledTableCell align="center" />
                               ) : mode === 'end' &&
                                 row.type !== 'good' &&
-                                ['unracking', 'anodize', 'painting'].includes(
+                                // eslint-disable-next-line prettier/prettier
+                                [
+                                  'unracking',
+                                  'anodize',
+                                  'painting',
+                                  'racking',
+                                ].includes(
+                                  // eslint-disable-next-line prettier/prettier
                                   type
                                 ) &&
                                 !disabled ? (
