@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/dist/next-server/lib/head';
 import Table from '@material-ui/core/Table';
@@ -17,6 +17,7 @@ import { useRouter } from 'next/router';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 import DeleteIcon from '@material-ui/icons/Delete';
+import Link from 'next/link';
 import Scrap from './scrap';
 import OdooLib from '../models/odoo';
 
@@ -90,9 +91,19 @@ const ListPalletOvenRackingUnrackingPage = ({
   const [rows, setRows] = React.useState([]);
   const [outname, setOutname] = React.useState([]);
   const [disabled, setDisable] = React.useState(false);
-  const minDate = OdooLib.MinDateTime(new Date().toISOString());
-  const maxDate = OdooLib.CurrentTime(new Date().toISOString());
-  const [date, setDate] = React.useState(new Date().toISOString());
+  const [date, setDate] = React.useState({
+    minDate: OdooLib.MinDateTime(new Date().toISOString()),
+    maxDate: OdooLib.CurrentTime(new Date().toISOString()),
+    dateNow: new Date().toISOString(),
+  });
+
+  useEffect(() => {
+    const getDate = async () => {
+      const newDate = await odoo.getDateTolerance(new Date().toISOString());
+      setDate({ ...date, minDate: newDate });
+    };
+    getDate();
+  }, [date.minDate, mode]);
 
   const getData = async () => {
     setLoading(true);
@@ -168,7 +179,7 @@ const ListPalletOvenRackingUnrackingPage = ({
     e.preventDefault();
     switch (e.detail) {
       case 1:
-        if (!date || date < minDate) {
+        if (!date.dateNow || date.dateNow < date.minDate) {
           setMsgBox({
             variant: 'error',
             message:
@@ -242,7 +253,7 @@ const ListPalletOvenRackingUnrackingPage = ({
         outputIds,
         scrapbs,
         racks,
-        OdooLib.OdooDateTime(date)
+        OdooLib.OdooDateTime(date.dateNow)
       );
       if (!data.faultCode) {
         const rws = rows
@@ -270,7 +281,7 @@ const ListPalletOvenRackingUnrackingPage = ({
     e.preventDefault();
     switch (e.detail) {
       case 1:
-        if (!date || date < minDate) {
+        if (!date.dateNow || date.dateNow < date.minDate) {
           setMsgBox({
             variant: 'error',
             message:
@@ -362,7 +373,7 @@ const ListPalletOvenRackingUnrackingPage = ({
       load = false;
       remvLoc();
     };
-  }, []);
+  }, [mode]);
 
   return (
     <>
@@ -373,15 +384,15 @@ const ListPalletOvenRackingUnrackingPage = ({
         <Grid item xs={4}>
           {mode === 'start' ? (
             <TextField
-              id="date"
-              label="Tanggal"
+              id="date-start"
+              label="Tanggal Awal"
               type="datetime-local"
               value={
                 rows.length > 0
                   ? rows[0].date_start
                     ? OdooLib.formatDateTime(rows[0].date_start)
-                    : OdooLib.CurrentTime(date)
-                  : OdooLib.CurrentTime(date)
+                    : OdooLib.CurrentTime(date.dateNow)
+                  : OdooLib.CurrentTime(date.dateNow)
               }
               onChange={(e) => {
                 const newRows = rows.map((x) => {
@@ -391,7 +402,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                   };
                 });
                 setRows(newRows);
-                setDate(e.target.value);
+                setDate({ ...date, dateNow: e.target.value });
               }}
               required
               className={classes.textField}
@@ -401,22 +412,22 @@ const ListPalletOvenRackingUnrackingPage = ({
               InputProps={{
                 // readOnly: press.status === 'Done',
                 inputProps: {
-                  min: minDate,
-                  max: maxDate,
+                  min: date.minDate,
+                  max: date.maxDate,
                 },
               }}
             />
           ) : (
             <TextField
-              id="date"
-              label="Tanggal"
+              id="date-finished"
+              label="Tanggal Akhir"
               type="datetime-local"
               value={
                 rows.length > 0
                   ? rows[0].date_finished
                     ? OdooLib.formatDateTime(rows[0].date_finished)
-                    : OdooLib.CurrentTime(date)
-                  : OdooLib.CurrentTime(date)
+                    : OdooLib.CurrentTime(date.dateNow)
+                  : OdooLib.CurrentTime(date.dateNow)
               }
               onChange={(e) => {
                 const newRows = rows.map((x) => {
@@ -426,7 +437,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                   };
                 });
                 setRows(newRows);
-                setDate(e.target.value);
+                setDate({ ...date, dateNow: e.target.value });
               }}
               required
               className={classes.textField}
@@ -436,8 +447,8 @@ const ListPalletOvenRackingUnrackingPage = ({
               InputProps={{
                 // readOnly: press.status === 'Done',
                 inputProps: {
-                  min: minDate,
-                  max: maxDate,
+                  min: date.minDate,
+                  max: date.maxDate,
                 },
               }}
             />
@@ -786,6 +797,25 @@ const ListPalletOvenRackingUnrackingPage = ({
               ''
             )}
           </Paper>
+        </Grid>
+        <Grid item xs={3} md={3} sm={3}>
+          {mode === 'start' && disabled ? (
+            <Link
+              href={{
+                pathname: '/listPalletOvenRackingUnracking',
+                query: {
+                  type,
+                  mode: 'end',
+                  pallet,
+                  mchId,
+                },
+              }}
+            >
+              Go TO Finished
+            </Link>
+          ) : (
+            ''
+          )}
         </Grid>
       </Grid>
     </>

@@ -165,10 +165,12 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
         message: 'Field Required Harus di isi',
       });
     } else {
-      const produce = await odoo.actCreateCorr(etching);
+      const newEtching = { ...etching, date_finished: etching.date_finished };
+      const produce = await odoo.actCreateCorr(newEtching);
       if (!produce.faultCode) {
         setCorr({
           ...produce,
+          date_finished: OdooLib.formatDateTime(produce.date_finished),
         });
         setLoading(false);
         setMsgBox({ variant: 'success', message: 'Transaction Has Been Done' });
@@ -198,12 +200,16 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
 
   const inWork = async () => {
     setMsgBox({ variant: 'success', message: '' });
-
     setLoading(true);
-    const moveLines = await odoo.actCreateCorr(etching);
+    const newEtching = {
+      ...etching,
+      date_start: OdooLib.OdooDateTime(etching.date_start),
+    };
+    const moveLines = await odoo.actCreateCorr(newEtching);
     if (!moveLines.faultCode) {
       setCorr({
         ...moveLines,
+        date_start: OdooLib.formatDateTime(moveLines.date_start),
       });
     } else {
       setLoading(false);
@@ -215,7 +221,11 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
     setLoading(true);
     const woOrder = await odoo.getWoCorrective(woId, type);
     if (!woOrder.faultCode) {
-      setCorr({ ...woOrder });
+      setCorr({
+        ...woOrder,
+        date_start: OdooLib.formatDateTime(woOrder.date_start),
+        date_finished: OdooLib.formatDateTime(woOrder.date_finished),
+      });
     } else {
       setMsgBox({ variant: 'error', message: 'Load data Error' });
     }
@@ -248,17 +258,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
               </Paper>
             </Grid>
 
-            <Grid item xs={3} md={3} sm={3}>
-              <Paper className={classes.paper} elevation={0}>
-                {etching.state === 'startworking' ? (
-                  <Button variant="contained" onClick={() => setDone()}>
-                    End
-                  </Button>
-                ) : (
-                  ''
-                )}
-              </Paper>
-            </Grid>
+            <Grid item xs={3} md={3} sm={3} />
           </Grid>
           <Grid item xs={12} md={12} sm={12}>
             {etching.warning ? (
@@ -312,11 +312,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                       id="dateStart"
                       name="dateStart"
                       variant="outlined"
-                      value={
-                        etching.date_start
-                          ? OdooLib.formatDateTime(etching.date_start)
-                          : ''
-                      }
+                      value={etching.date_start}
                       className={classes.textFieldColumn}
                       InputLabelProps={{
                         shrink: false,
@@ -338,11 +334,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                       id="dateEnd"
                       name="dateEnd"
                       variant="outlined"
-                      value={
-                        etching.date_finished
-                          ? OdooLib.formatDateTime(etching.date_finished)
-                          : ''
-                      }
+                      value={etching.date_finished}
                       className={classes.textFieldColumn}
                       InputLabelProps={{
                         shrink: false,
@@ -672,6 +664,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                         <MenuItem value="ready">Ready</MenuItem>
                         <MenuItem value="notok">Not Ok</MenuItem>
                         <MenuItem value="nitrid">Need Nitriding</MenuItem>
+                        <MenuItem value="scrap">Scrap</MenuItem>
                       </Select>
                       <FormHelperText>
                         {!etching.die_state && etching.state === 'startworking'
@@ -710,6 +703,19 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                   </Grid>
                 </Grid>
               </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+              <Paper className={classes.paper} elevation={0}>
+                <Grid item xs>
+                  {etching.state === 'startworking' ? (
+                    <Button variant="contained" onClick={() => setDone()}>
+                      End
+                    </Button>
+                  ) : (
+                    ' '
+                  )}
+                </Grid>
+              </Paper>
             </Grid>
           </Paper>
 

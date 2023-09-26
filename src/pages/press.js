@@ -158,8 +158,19 @@ const useStyles = makeStyles({
 const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
   const router = useRouter();
   const odoo = new OdooLib();
-  const minDate = OdooLib.MinDateTime(new Date().toISOString());
-  const maxDate = OdooLib.CurrentTime(new Date().toISOString());
+  const [date, setDate] = React.useState({
+    minDate: OdooLib.MinDateTime(new Date().toISOString()),
+    maxDate: OdooLib.CurrentTime(new Date().toISOString()),
+  });
+
+  useEffect(() => {
+    const getDate = async () => {
+      const newDate = await odoo.getDateTolerance(new Date().toISOString());
+      setDate({ ...date, minDate: newDate });
+    };
+    getDate();
+  }, [date.minDate]);
+
   const shiftName = localStorage.getItem('shiftName');
   const { woId, productionId } = router.query;
   const mchID = Number(localStorage.getItem('pressMchId'));
@@ -599,8 +610,8 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                   InputProps={{
                     readOnly: press.status === 'Done',
                     inputProps: {
-                      min: minDate,
-                      max: maxDate,
+                      min: date.minDate,
+                      max: date.maxDate,
                     },
                   }}
                 />
@@ -642,8 +653,8 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                   InputProps={{
                     readOnly: press.status !== 'In Progress',
                     inputProps: {
-                      min: minDate,
-                      max: maxDate,
+                      min: date.minDate,
+                      max: date.maxDate,
                     },
                   }}
                 />

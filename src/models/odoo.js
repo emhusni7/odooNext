@@ -131,6 +131,7 @@ export default class OdooLib {
     this.getPickTarget = this.getPickTarget.bind(this);
     this.getProductCategory = this.getProductCategory.bind(this);
     this.getPrintInvReport = this.printInvReport.bind(this);
+    this.getDateTolerance = this.getDateTolerance.bind(this);
   }
 
   login(username, password) {
@@ -2561,6 +2562,28 @@ export default class OdooLib {
     }
   }
 
+  async getDateTolerance(str) {
+    const dt = new Date(str);
+    try {
+      const numDays = await this.executeKW(
+        'mrp.property.group',
+        'search_read',
+        [[['name', '=', 'back_date']], ['description'], 0, 1]
+      );
+
+      // eslint-disable-next-line no-eval
+      dt.setDate(dt.getDate() - eval(numDays[0].description));
+      const mnth = `0${dt.getMonth() + 1}`.slice(-2);
+      const day = `0${dt.getDate()}`.slice(-2);
+      return `${[dt.getFullYear(), mnth, day].join('-')}T00:00`;
+    } catch (err) {
+      dt.setDate(dt.getDate() - 1);
+      const mnth = `0${dt.getMonth() + 1}`.slice(-2);
+      const day = `0${dt.getDate()}`.slice(-2);
+      return `${[dt.getFullYear(), mnth, day].join('-')}T00:00`;
+    }
+  }
+
   static formatDateTime(str) {
     const dt = new Date(str);
     dt.setHours(dt.getHours() + 7);
@@ -2595,6 +2618,7 @@ export default class OdooLib {
     return `${[dt.getFullYear(), mnth, day].join('-')}T${hours}:${minutes}`;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   static MinDateTime(str) {
     const dt = new Date(str);
     dt.setDate(dt.getDate() - 1);
