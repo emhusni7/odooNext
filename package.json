@@ -60,11 +60,7 @@
     "lint-staged": "^10.0.0-1",
     "prettier": "^1.19.1"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
+  
   "lint-staged": {
     "*.{js,json,md,css}": [
       "prettier --trailing-comma es5 --single-quote --write"

@@ -100,7 +100,7 @@ const ListPalletOvenRackingUnrackingPage = ({
   useEffect(() => {
     const getDate = async () => {
       const newDate = await odoo.getDateTolerance(new Date().toISOString());
-      setDate({ ...date, minDate: newDate });
+      setDate({ ...date, minDate: newDate, dateNow: OdooLib.CurrentTime(new Date().toISOString()) });
     };
     getDate();
   }, [date.minDate, mode]);

@@ -228,6 +228,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
       const produce = await odoo.endPress({
         ...press,
         mchID,
+        dateStart: OdooLib.OdooDateTime(press.dateStart),
         dateEnd: OdooLib.OdooDateTime(press.dateEnd),
       });
       if (!produce.faultCode) {
