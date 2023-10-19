@@ -17,6 +17,10 @@ const theme = createMuiTheme({
     background: {
       default: '#fff',
     },
+    action: {
+      disabledBackground: '#5b5b5b',
+      disabled: '#ffffff'
+    }
   },
   overrides: {
     MuiButton: {

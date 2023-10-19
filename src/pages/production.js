@@ -50,6 +50,15 @@ const useStyles = makeStyles((theme) => ({
   button: {
     width: '100%',
     margin: 10,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  buttonCancel: {
+    width: '100%',
+    margin: 10,
+    backgroundColor: 'red',
+    fontWeight: 'bold',
+    color: 'white',
   },
   paperButton: {
     marginTop: 10,
@@ -84,18 +93,34 @@ const useStyles = makeStyles((theme) => ({
     marginRight: 10,
     marginTop: 10,
   },
+  disabledButton: {
+    backgroundColor: theme.palette.primary || 'red'
+  },
 }));
 
 const customStyles = {
   option: (provided, state) => ({
     ...provided,
-    color: state.isSelected ? 'yellow' : 'black',
-    backgroundColor: state.isSelected ? 'green' : 'white',
+    fontWeight: 'bold',
+    color: state.isSelected ? 'white' : 'black',
+    backgroundColor: state.isSelected ? 'blue' : 'white ',
+    "&:hover": {
+      backgroundColor: "#2574f4"
+    }
   }),
   control: (provided) => ({
     ...provided,
+    color: 'black',
+    fontWeight: 'bold',
+    borderColor: '#2574f4',
     marginTop: '3%',
   }),
+  placeholder: (defaultStyles) => {
+    return {
+        ...defaultStyles,
+        color: 'red',
+    }
+}
 };
 
 const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
@@ -834,14 +859,13 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                 <Grid container spacing={1}>
                   <Grid item xs={4} md={4} sm={4}>
                     <Button
-                      className={classes.button}
+                       className={classes.button}
                       disabled={
                         disable ||
                         mvLine.lines.length === 0 ||
                         mvLine.consume.length === 0 ||
                         TotalConsume < Total
                       }
-                      type="button"
                       variant="contained"
                       onClick={() => handleSubmit()}
                     >
@@ -862,11 +886,10 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                   </Grid>
                   <Grid item xs={4} md={4} sm={4}>
                     <Button
-                      className={classes.button}
+                      className={classes.buttonCancel}
                       disabled={!mvLine.pickingId || printLoading}
-                      type="button"
-                      variant="outlined"
-                      color="primary"
+                      
+                      variant="contained"
                       onClick={() => actCancel()}
                     >
                       Cancel
