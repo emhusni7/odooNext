@@ -1227,6 +1227,33 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                       />
                     </Paper>
                   </Grid>
+                  <Grid item xs={3} sm={3}>
+                    <Paper className={classes.paperConsumeBottom} elevation={0}>
+                      <TextField
+                        variant="outlined"
+                        type="number"
+                        id="temp_billet"
+                        name="temp_billet"
+                        disabled={press.status === 'Done'}
+                        value={press.temp_billet}
+                        label="Temperature"
+                        onChange={(e) =>
+                          setPress({
+                            ...press,
+                            temp_billet: e.target.value,
+                          })
+                        }
+                        onFocus={() => {
+                          setPress({
+                            ...press,
+                            temp_billet: '',
+                          });
+                        }}
+                        className={classes.textField}
+                        InputLabelProps={{ shrink: true }}
+                      />
+                    </Paper>
+                  </Grid>
                 </Grid>
               </TabPanel>
               <TabPanel value={value} index={1}>

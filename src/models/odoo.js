@@ -710,7 +710,7 @@ export default class OdooLib {
       const calc = await this.executeKW(
         'mrp.production.output',
         'recalculatePress',
-        [press.outputId, press.sample, press.rarm_speed, press.presure, press.temp]
+        [press.outputId, press.sample, press.rarm_speed, press.presure, press.temp, press.temp_billet]
       );
 
       return calc;
@@ -884,7 +884,8 @@ export default class OdooLib {
         press.note,
         press.dateEnd,
         press.temp,
-        press.dateStart
+        press.dateStart,
+        press.temp_billet,
       ]);
       return result;
     } catch (e) {
