@@ -1209,7 +1209,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                         name="temp"
                         disabled={press.status === 'Done'}
                         value={press.temp}
-                        label="Temperature"
+                        label="Temperature Exit"
                         onChange={(e) =>
                           setPress({
                             ...press,
@@ -1236,7 +1236,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                         name="temp_billet"
                         disabled={press.status === 'Done'}
                         value={press.temp_billet}
-                        label="Temperature"
+                        label="Temperature Billet"
                         onChange={(e) =>
                           setPress({
                             ...press,
