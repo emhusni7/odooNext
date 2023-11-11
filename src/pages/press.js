@@ -318,6 +318,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
       });
       setPress({
         ...moveLines,
+        temp: 520,
         dateStart: press.dateStart,
         // eslint-disable-next-line no-nested-ternary
         dateEnd: press.dateEnd
@@ -477,6 +478,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
         : false,
       consume: arrCons,
     };
+    console.log(newWo)
     setPress({
       ...press,
       ...newWo,
@@ -1107,12 +1109,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                             sample: Number(event.target.value),
                           });
                         }}
-                        onFocus={() => {
-                          setPress({
-                            ...press,
-                            sample: '',
-                          });
-                        }}
+                      
                       />
                     </Paper>
                   </Grid>
@@ -1135,12 +1132,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                             presure: Number(e.target.value),
                           })
                         }
-                        onFocus={() => {
-                          setPress({
-                            ...press,
-                            presure: '',
-                          });
-                        }}
+                      
                       />
                     </Paper>
                   </Grid>
@@ -1159,12 +1151,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                             lotBillet: parseFloat(e.target.value, 10),
                           });
                         }}
-                        onFocus={() => {
-                          setPress({
-                            ...press,
-                            lotBillet: '',
-                          });
-                        }}
+                        
                         className={classes.textField}
                         InputLabelProps={{ shrink: true }}
                       />
@@ -1191,12 +1178,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                             rarm_speed: Number(e.target.value),
                           })
                         }
-                        onFocus={() => {
-                          setPress({
-                            ...press,
-                            rarm_speed: '',
-                          });
-                        }}
+                       
                       />
                     </Paper>
                   </Grid>
@@ -1216,12 +1198,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                             temp: e.target.value,
                           })
                         }
-                        onFocus={() => {
-                          setPress({
-                            ...press,
-                            temp: '',
-                          });
-                        }}
+                       
                         className={classes.textField}
                         InputLabelProps={{ shrink: true }}
                       />
@@ -1243,12 +1220,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                             temp_billet: e.target.value,
                           })
                         }
-                        onFocus={() => {
-                          setPress({
-                            ...press,
-                            temp_billet: '',
-                          });
-                        }}
+                       
                         className={classes.textField}
                         InputLabelProps={{ shrink: true }}
                       />
