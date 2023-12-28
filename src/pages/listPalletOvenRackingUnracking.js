@@ -209,7 +209,7 @@ const ListPalletOvenRackingUnrackingPage = ({
       if (!x.rack || x.rack === '') {
         errorRack = true;
       } else {
-        racks.push({ id: x.id, rack: x.rack });
+        racks.push({ id: x.id, rack: x.rack, hardness: x.hardness });
       }
       x.lines.forEach((y) => {
         if (y.scrapId === 0) {
@@ -279,6 +279,8 @@ const ListPalletOvenRackingUnrackingPage = ({
 
   const actionDone = (e) => {
     e.preventDefault();
+    const checkHardness = rows.filter((x) => x.error == true).map((x) => x.output_id);
+    
     switch (e.detail) {
       case 1:
         if (!date.dateNow || date.dateNow < date.minDate) {
@@ -286,6 +288,12 @@ const ListPalletOvenRackingUnrackingPage = ({
             variant: 'error',
             message:
               'Tanggal Harus Di Isi / Tanggal Backdate Lebih dari 1 hari',
+          });
+        } else if (checkHardness.length>0){
+          setMsgBox({
+            variant: 'error',
+            message:
+              'Isian Hardness Salah Contoh Format Depan;Tengah;Belakang',
           });
         } else {
           setDoneS();
@@ -331,6 +339,25 @@ const ListPalletOvenRackingUnrackingPage = ({
     }
   };
 
+  const pattern = /^[\0-9\.]+;([\0-9]+\;)+\d*$/
+  const changeHardnes = (e, index) => {
+    e.preventDefault();
+    setMsgBox({ variant: 'success', message: '' });
+    const outs = [...rows];
+    const out = { ...outs[index] };
+
+    if (pattern.test(e.target.value) === false){
+      out.error = true;
+    } else {
+      out.error = false;
+    }
+    if (!!e.target.value){
+    out.hardness = e.target.value;
+    outs[index] = out;
+    setRows(outs);
+  }
+  };
+
   const TextF = (index, qty) => {
     return (
       <TextField
@@ -360,6 +387,27 @@ const ListPalletOvenRackingUnrackingPage = ({
       />
     );
   };
+
+  const Hardness = (index, str, errors) => {
+    console.log(str);
+    return (<TextField
+      id="hardness"
+      name="hardness"
+      error={errors}
+      disabled={
+        disabled ||
+        ![
+          'oven',
+        ].includes(type)
+      }
+      value={str}
+      onChange={(e) => changeHardnes(e, index)}
+      
+      margin="dense"
+    />)
+  }
+
+ 
 
   React.useEffect(() => {
     let load = localStorage.getItem('loading');
@@ -493,6 +541,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                   )}
                   <StyledTableCell align="center">Type</StyledTableCell>
                   <StyledTableCell align="center">Note</StyledTableCell>
+                  {(mode === 'end' ) && ['oven'].includes(type)? (<StyledTableCell align="center">Hardness</StyledTableCell>): ''}
                   {(mode === 'end' && !disabled) ||
                   (mode === 'start' &&
                     [
@@ -625,6 +674,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                         <StyledTableCell align="center">
                           {row.note}
                         </StyledTableCell>
+                        {(mode === 'end' && ['oven'].includes(type)) ? <StyledTableCell align="center">{Hardness(index, row.hardness, row.error)}</StyledTableCell> : ''} 
                         {(row.type === 'good' &&
                           mode === 'end' &&
                           row.note !== 'Roll' &&
@@ -714,9 +764,10 @@ const ListPalletOvenRackingUnrackingPage = ({
                               <StyledTableCell align="center">
                                 {x.note}
                               </StyledTableCell>
+                            
                               {disabled ? (
                                 ''
-                              ) : (
+                              ) :  (
                                 <StyledTableCell>
                                   <IconButton
                                     className={classes.iconButton}
