@@ -476,6 +476,12 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
         : woOrder.status !== 'New'
         ? OdooLib.CurrentTime(new Date().toISOString())
         : false,
+      downtime_start: woOrder.downtime_start
+      ? OdooLib.formatDateTime(woOrder.downtime_start)
+      : OdooLib.CurrentTime(new Date().toISOString()),
+      downtime_end: woOrder.downtime_end
+      ? OdooLib.formatDateTime(woOrder.downtime_end)
+      : OdooLib.CurrentTime(new Date().toISOString()),
       consume: arrCons,
     };
     console.log(newWo)
@@ -1227,6 +1233,79 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                     </Paper>
                   </Grid>
                 </Grid>
+                
+                <Grid container spacing={3}>
+                  <Grid item xs={3} sm={3}>
+                    <Paper className={classes.paper} elevation={0}>
+                    <TextField
+                        id="DtStart"
+                        label="Downtime Start"
+                        type="datetime-local"
+                        value={press.downtime_start ? press.downtime_start : ''}
+                        onChange={(e) => {
+                          setPress({ ...press, downtime_start: e.target.value });
+                        }}
+                        className={classes.textField}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        InputProps={{
+                          readOnly: press.status === 'Done',
+                          inputProps: {
+                            min: date.minDate,
+                            max: date.maxDate,
+                          },
+                        }}
+                      />
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={3} sm={3}>
+                    <Paper className={classes.paper} elevation={0}>
+                    <TextField
+                        id="dtEnd"
+                        label="Downtime End"
+                        type="datetime-local"
+                        value={press.downtime_end ? press.downtime_end : ''}
+                        onChange={(e) => {
+                          setPress({ ...press, downtime_end: e.target.value });
+                        }}
+                        className={classes.textField}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        InputProps={{
+                          readOnly: press.status === 'Done',
+                          inputProps: {
+                            min: date.minDate,
+                            max: date.maxDate,
+                          },
+                        }}
+                      />
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={3} sm={3}>
+                    <Paper className={classes.paper} elevation={0}>
+                      <TextField
+                        variant="outlined"
+                        id="reason"
+                        name="reason"
+                        disabled={press.status === 'Done'}
+                        label="Reason"
+                        className={classes.textField}
+                        value={press.downtime_reason}
+                        InputLabelProps={{ shrink: true }}
+                        onChange={(e) =>
+                          setPress({
+                            ...press,
+                            downtime_reason: e.target.value,
+                          })
+                        }
+                      
+                      />
+                    </Paper>
+                  </Grid>
+
+                 </Grid>
               </TabPanel>
               <TabPanel value={value} index={1}>
                 <TableContainer component={Paper}>
