@@ -478,10 +478,10 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
         : false,
       downtime_start: woOrder.downtime_start !== ''
       ? OdooLib.formatDateTime(woOrder.downtime_start)
-      : '',
+      : false,
       downtime_end: woOrder.downtime_end !== ''
       ? OdooLib.formatDateTime(woOrder.downtime_end)
-      : '',
+      : false,
       consume: arrCons,
     };
     console.log(newWo)
