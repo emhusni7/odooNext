@@ -1241,7 +1241,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                         id="DtStart"
                         label="Downtime Start"
                         type="datetime-local"
-                        value={press.downtime_start ? press.downtime_start : ''}
+                        value={press.downtime_start ? press.downtime_start : false}
                         onChange={(e) => {
                           setPress({ ...press, downtime_start: e.target.value });
                         }}
@@ -1265,7 +1265,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                         id="dtEnd"
                         label="Downtime End"
                         type="datetime-local"
-                        value={press.downtime_end ? press.downtime_end : ''}
+                        value={press.downtime_end ? press.downtime_end : false}
                         onChange={(e) => {
                           setPress({ ...press, downtime_end: e.target.value });
                         }}
