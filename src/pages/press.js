@@ -476,12 +476,12 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
         : woOrder.status !== 'New'
         ? OdooLib.CurrentTime(new Date().toISOString())
         : false,
-      downtime_start: woOrder.downtime_start
+      downtime_start: woOrder.downtime_start !== ''
       ? OdooLib.formatDateTime(woOrder.downtime_start)
-      : OdooLib.CurrentTime(new Date().toISOString()),
-      downtime_end: woOrder.downtime_end
+      : '',
+      downtime_end: woOrder.downtime_end !== ''
       ? OdooLib.formatDateTime(woOrder.downtime_end)
-      : OdooLib.CurrentTime(new Date().toISOString()),
+      : '',
       consume: arrCons,
     };
     console.log(newWo)
