@@ -6,7 +6,7 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable no-param-reassign */
 /* eslint-disable react/prop-types */
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useEffect } from 'react';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import TextField from '@material-ui/core/TextField';
@@ -19,6 +19,7 @@ import Clear from '@material-ui/icons/Clear';
 import DeleteOutline from '@material-ui/icons/DeleteOutline';
 import Edit from '@material-ui/icons/Edit';
 import Add from '@material-ui/icons/Add';
+import { Paper } from '@material-ui/core';
 import FilterList from '@material-ui/icons/FilterList';
 import FirstPage from '@material-ui/icons/FirstPage';
 import LastPage from '@material-ui/icons/LastPage';
@@ -57,13 +58,14 @@ const tableIcons = {
 const useStyles = makeStyles((theme) => ({
   root: {
     transform: 'translateZ(0px)',
-    flexGrow: 1,
+    
   },
   textFieldSupplier: {
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(1),
     width: '90%',
     marginTop: theme.spacing(2),
+    color: 'black',
   },
   textFieldSourceDocument: {
     marginLeft: theme.spacing(2),
@@ -71,6 +73,7 @@ const useStyles = makeStyles((theme) => ({
     width: '90%',
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
+    color: 'black',
   },
   comboBoxType: {
     marginLeft: theme.spacing(2),
@@ -110,11 +113,25 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
   const [pickingType, setType] = React.useState([]);
   const [errorType, setError] = React.useState({ helper: '', error: false });
   const [disabled, setDisable] = React.useState(false);
+  const [date, setDate] = React.useState({
+    minDate: OdooLib.MinDateTime(new Date().toISOString()),
+    maxDate: OdooLib.CurrentTime(new Date().toISOString()),
+  });
+
+  useEffect(() => {
+    const getDate = async () => {
+      const newDate = await odoo.getDateTolerance(new Date().toISOString());
+      setDate({ ...date, minDate: newDate });
+    };
+    getDate();
+  }, [date.minDate]);
+
   const [picking, setPicking] = React.useState({
     id: '',
     type: '',
     location_id: '',
     location_dest_id: '',
+    date_transfer: false,
     location_name: '',
     location_dest_name: '',
     name: '',
@@ -172,8 +189,8 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
   };
 
   const onValidate = async (ref) => {
-    if (!picking.type) {
-      setError({ helper: 'Type is Required Field', error: true });
+    if (!picking.type || !picking.date_transfer) {
+      setError({ helper: 'Type is Required Field / Date Transfer Empty', error: true });
     } else if (
       ref.current.state.showAddRow ||
       ref.current.state.lastEditingRow
@@ -193,6 +210,7 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
           product_uom: data.uom_id,
           length_billet: data.length,
           qty_billet: data.btg,
+          date:  OdooLib.OdooDateTime(picking.date_transfer),
           state: 'draft',
           location_id: picking.location_id,
           location_dest_id: picking.location_dest_id,
@@ -201,8 +219,8 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
           qty_available: data.qty_available,
         },
       ]);
-
-      const newPick = await odoo.pickMelting(picking, mv);
+      const picks = {...picking, date_transfer: OdooLib.OdooDateTime(picking.date_transfer)}
+      const newPick = await odoo.pickMelting(picks, mv);
       setLoading(false);
       if (newPick.faultCode) {
         setMsgBox({ variant: 'error', message: newPick.message });
@@ -506,7 +524,7 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
       <Head>
         <title>ALUBLESS - Pemakaian</title>
       </Head>
-      <div className={classes.root}>
+      <div >
         <>
           <Grid container spacing={1}>
             <Grid item xs={6} md={6} sm={12}>
@@ -517,6 +535,9 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
                 margin="dense"
                 variant="outlined"
                 value={picking.name}
+                InputLabelProps={{
+                  style: {color: 'black'}
+                }}
                 disabled
               />
             </Grid>
@@ -551,12 +572,16 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
                     error={errorType.error}
                     helperText={errorType.helper}
                     className={classes.comboBoxType}
+                    InputLabelProps={{
+                      style: {color: 'black'}
+                    }}
                     fullWidth={15}
                   />
                 )}
               />
             </Grid>
           </Grid>
+         
 
           <Grid container spacing={1}>
             <Grid item xs={6} md={6} sm={12}>
@@ -567,6 +592,9 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
                 margin="dense"
                 variant="outlined"
                 value={picking.location_name}
+                InputLabelProps={{
+                  style: {color: 'black'}
+                }}
                 disabled
               />
             </Grid>
@@ -578,6 +606,9 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
                 margin="dense"
                 variant="outlined"
                 value={picking.location_dest_name}
+                InputLabelProps={{
+                  style: {color: 'black'}
+                }}
                 disabled
               />
             </Grid>
@@ -597,6 +628,9 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
                     sourceDocument: e.target.value,
                   })
                 }
+                InputLabelProps={{
+                  style: {color: 'black'}
+                }}
                 variant="outlined"
               />
             </Grid>
@@ -651,6 +685,9 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
                     label="Lot"
                     margin="dense"
                     variant="outlined"
+                    InputLabelProps={{
+                      style: {color: 'black'}
+                    }}
                     className={classes.comboBoxType}
                     fullWidth={15}
                     onChange={async (e) => {
@@ -676,18 +713,43 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
                 )}
               />
             </Grid>
-            <Grid item xs={9} md={9} sm={9} />
-            <Grid item xs={3} md={3} sm={3}>
-              <Button
-                variant="outlined"
-                color="primary"
-                type="button"
-                disabled={!picking.lot_id || disabled}
-                onClick={() => addItem()}
-              >
-                Transfer Billet
-              </Button>
+            <Grid container spacing={1}>
+              <Grid item xs={6} md={6} sm={6}>
+                  <TextField
+                      id="date_transfer"
+                      label="Date Transfer"
+                      type="datetime-local"
+                      value={picking.date_transfer ? picking.date_transfer : false}
+                      onChange={(e) => {
+                        setPicking({ ...picking, date_transfer: e.target.value });
+                      }}
+                      className={classes.textFieldSupplier}
+                      InputLabelProps={{
+                        shrink: true,
+                        style: {color: 'black'}
+                      }}
+                      InputProps={{
+                        readOnly: picking.state === 'Done',
+                        inputProps: {
+                          min: date.minDate,
+                          max: date.maxDate,
+                        },
+                      }}
+                    />
+                
+              </Grid>
+              <Grid item xs={3} md={3} sm={3}>
+                <Button
+                  variant="outlined"
+                  style={{ backgroundColor: 'blue', marginTop: '10px', marginLeft: '15px' }}
+                  color="primary"
+                  disabled={!picking.lot_id || disabled}
+                  onClick={() => addItem()}
+                >
+                  Transfer Billet
+                </Button>
             </Grid>
+          </Grid>
           </Grid>
         </>
 
@@ -707,6 +769,7 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
               variant="contained"
               color="primary"
               type="button"
+              style={{ backgroundColor: 'green', marginTop: '10px', marginLeft: '15px' }}
               disabled={disabled || picking.moves.length === 0}
               onClick={() => onValidate(tableRef)}
             >
@@ -717,6 +780,7 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
               className={classes.button}
               disabled={!disabled && !picking.name}
               type="button"
+              style={{ backgroundColor: 'white', marginTop: '10px', marginLeft: '15px', color: 'black' }}
               variant="outlined"
               color="primary"
               onClick={() => actReload()}
