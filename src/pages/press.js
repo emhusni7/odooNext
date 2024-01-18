@@ -406,7 +406,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
       press.outputId,
       press.moname,
       dtCons
-        ? OdooLib.OdooDateTime(dtCons[0].date)
+        ?  OdooLib.OdooDateTime(press.dateStart)
         : OdooLib.OdooDateTime(press.dateStart),
       productionId,
       dtCons
@@ -823,18 +823,18 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                                 <TextField
                                   id="date"
                                   type="datetime-local"
-                                  defaultValue={row.date}
-                                  value={row.date}
-                                  onChange={(e) => {
-                                    const dtCons = press.consume;
-                                    const consIdx = press.consume[index];
-                                    consIdx.date = e.target.value;
-                                    dtCons[index] = consIdx;
-                                    setPress({
-                                      ...press,
-                                      consume: dtCons,
-                                    });
-                                  }}
+                                  defaultValue={press.dateStart}
+                                  value={press.dateStart}
+                                  // onChange={(e) => {
+                                  //   const dtCons = press.consume;
+                                  //   const consIdx = press.consume[index];
+                                  //   consIdx.date = e.target.value;
+                                  //   dtCons[index] = consIdx;
+                                  //   setPress({
+                                  //     ...press,
+                                  //     consume: dtCons,
+                                  //   });
+                                  // }}
                                   InputLabelProps={{
                                     shrink: true,
                                   }}
