@@ -111,7 +111,8 @@ const ListPalletOvenRackingUnrackingPage = ({
     const data = await odoo.getCompute(
       type,
       rack,
-      mode === 'start' ? 'create' : 'read'
+      mode === 'start' ? 'create' : 'read',
+      mchId
     );
     const arrGood = [];
     data.forEach((dt) => {
