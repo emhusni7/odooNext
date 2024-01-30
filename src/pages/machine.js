@@ -147,7 +147,7 @@ const MachinePage = ({ setTitle }) => {
   });
   const { type } = useRouter().query;
   const odoo = new OdooLib();
-  const comboBox = (tyype, label, change) => {
+  const comboBox = (idintifier,tyype, label, change) => {
     const [open, setOpen] = React.useState(false);
     const [options, setOptions] = React.useState([]);
     const loading = open && options.length === 0;
@@ -288,8 +288,8 @@ const MachinePage = ({ setTitle }) => {
 
     return (
       <Autocomplete
-        id="combobox"
-        name="machine"
+        id={idintifier}
+        name={idintifier}
         open={open}
         onOpen={() => {
           setOpen(true);
@@ -910,7 +910,7 @@ const MachinePage = ({ setTitle }) => {
                   {type !== 'listQc' &&
                   type.match(/[^?]*/i)[0] !== 'searchCorr' ? (
                     <Box className="machine">
-                      {comboBox('machine', 'Machine', changeMachine)}
+                      {comboBox('machine_id','machine', 'Machine', changeMachine)}
                       {state.errorMch && (
                         <span style={{ color: 'red' }}>{state.errorMch}</span>
                       )}
@@ -919,14 +919,14 @@ const MachinePage = ({ setTitle }) => {
                     ''
                   )}
                   <Box className="shift">
-                    {comboBox('shift', 'Shift', changeShift)}
+                    {comboBox('shift_id','shift', 'Shift', changeShift)}
                     {state.errorShf && (
                       <span style={{ color: 'red' }}>{state.errorShf}</span>
                     )}
                   </Box>
                   {type === 'searchPress' ? (
                     <Box>
-                      {comboBox('Spv', 'SPV', changeSpv)}
+                      {comboBox('spv_id','Spv', 'SPV', changeSpv)}
                       {state.errorSpv && (
                         <span style={{ color: 'red' }}>{state.errorSpv}</span>
                       )}
