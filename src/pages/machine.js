@@ -141,6 +141,8 @@ const MachinePage = ({ setTitle }) => {
     snblMchName: '',
     rollMchId: '',
     rollMchName: '',
+    treatMchId: '',
+    treatMchName: '',
     errorMch: '',
     errorShf: '',
     errorSpv: '',
@@ -175,6 +177,8 @@ const MachinePage = ({ setTitle }) => {
             dt = await odoo.getMachine(['die_oven']);
           } else if (type === 'startEndOvenRackingUnracking?type=oven') {
             dt = await odoo.getMachine(['oven']);
+          } else if (type === 'startEndOvenRackingUnracking?type=treatment') {
+            dt = await odoo.getMachine(['treatment']);
           } else if (type === 'startEndOvenRackingUnracking?type=racking') {
             dt = await odoo.getMachine(['racking']);
           } else if (type === 'startEndOvenRackingUnracking?type=unracking') {
@@ -370,6 +374,13 @@ const MachinePage = ({ setTitle }) => {
         ...state,
         unrackingMchId: value.id,
         unrackingMchName: value.name,
+        errorMch: '',
+      });
+    } else if (type === 'startEndOvenRackingUnracking?type=treatment') {
+      setState({
+        ...state,
+        treatMchId: value.id,
+        treatMchName: value.name,
         errorMch: '',
       });
     } else if (type === 'startEndOvenRackingUnracking?type=anodize') {
@@ -644,6 +655,8 @@ const MachinePage = ({ setTitle }) => {
       result = state.pressMchId;
     } else if (type === 'startEndOvenRackingUnracking?type=oven') {
       result = state.ovenMchId;
+    } else if (type === 'startEndOvenRackingUnracking?type=treatment') {
+      result = state.treatMchId;
     } else if (type === 'startEndOvenRackingUnracking?type=racking') {
       result = state.rackingMchId;
     } else if (type === 'startEndOvenRackingUnracking?type=unracking') {
@@ -757,6 +770,9 @@ const MachinePage = ({ setTitle }) => {
         } else if (type === 'startEndOvenRackingUnracking?type=oven') {
           localStorage.setItem('ovenMchId', state.ovenMchId);
           localStorage.setItem('ovenMchName', state.ovenMchName);
+        } else if (type === 'startEndOvenRackingUnracking?type=treatment') {
+          localStorage.setItem('treatMchId', state.treatMchId);
+          localStorage.setItem('treatMchName', state.treatMchName);
         } else if (type === 'startEndOvenRackingUnracking?type=racking') {
           localStorage.setItem('rackingMchId', state.rackingMchId);
           localStorage.setItem('rackingMchName', state.rackingMchName);

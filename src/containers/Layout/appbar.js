@@ -123,6 +123,8 @@ const AppbarSection = ({ title, setMsgBox }) => {
     localStorage.removeItem('rackingMchName');
     localStorage.removeItem('unrackingMchId');
     localStorage.removeItem('unrackingMchName');
+    localStorage.removeItem('treatMchId');
+    localStorage.removeItem('treatMchName');
     localStorage.removeItem('drawnMchId');
     localStorage.removeItem('drawnMchName');
     localStorage.removeItem('polishMchId');

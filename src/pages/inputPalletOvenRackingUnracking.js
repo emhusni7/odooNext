@@ -110,6 +110,8 @@ const InputPalletOvenRackingUnrackingPage = ({
       mchId = localStorage.getItem('drawnMchId');
     } else if (type === 'anodize') {
       mchId = localStorage.getItem('anodizeMchId');
+    } else if (type === 'treatment') {
+      mchId = localStorage.getItem('treatMchId');
     } else if (type === 'polish') {
       mchId = localStorage.getItem('polishMchId');
     } else if (type === 'brush') {
@@ -128,6 +130,8 @@ const InputPalletOvenRackingUnrackingPage = ({
       mchId = localStorage.getItem('preChromateMchId');
     } else if (type === 'sandblasting') {
       mchId = localStorage.getItem('snblMchId');
+    } else if (type === 'treatment') {
+      mchId = localStorage.getItem('treatMchId');
     }
     setLoading(false);
     route.push({

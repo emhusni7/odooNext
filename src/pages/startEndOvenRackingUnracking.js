@@ -85,6 +85,8 @@ const StartEndOvenRackingUnrackingPage = ({ setTitle }) => {
       result = localStorage.getItem('preChromateMchId');
     } else if (type === 'sandblasting') {
       result = localStorage.getItem('snblMchId');
+    } else if (type === 'treatment') {
+      result = localStorage.getItem('treatMchId');
     }
     return result;
   };
