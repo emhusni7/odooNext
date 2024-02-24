@@ -150,6 +150,10 @@ const useStyles = makeStyles({
 const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
   const router = useRouter();
   const odoo = new OdooLib();
+  const [date, setDate] = React.useState({
+    minDate: OdooLib.MinDateTime(new Date().toISOString()),
+    maxDate: OdooLib.CurrentTime(new Date().toISOString()),
+  });
 
   const shiftId = Number(localStorage.getItem('shiftId'));
   const shiftName = localStorage.getItem('shiftName');
@@ -227,11 +231,12 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
         message: 'Problem Corrective filled but not Clik Button',
       });
     } else {
-      const produce = await odoo.endEtching(etching);
+      const produce = await odoo.endEtching({...etching,  
+        dateStart: etching.dateStart !== '' ? OdooLib.OdooDateTime(etching.dateStart): '',
+        dateEnd: etching.dateEnd !== '' ? OdooLib.OdooDateTime(etching.dateEnd): ''});
       if (!produce.faultCode) {
         setEtching({
           ...etching,
-          dateEnd: produce.date_finished,
           status: 'Done',
         });
 
@@ -247,9 +252,12 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
   const saveProduce = async () => {
     setLoading(true);
     setMsgBox({ variant: 'success', message: '' });
+    console.log(etching.dateEnd)
     const produce = await odoo.saveProduceEtc(
       etching.outputId,
-      etching.produce
+      etching.produce,
+      etching.dateStart !== '' ? OdooLib.OdooDateTime(etching.dateStart): '',
+      etching.dateEnd !== '' ? OdooLib.OdooDateTime(etching.dateEnd) : ''
     );
     if (!produce.faultCode) {
       setLoading(false);
@@ -296,7 +304,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
     const result = await odoo.saveBillet(
       etching.outputId,
       etching.moname,
-      etching.dateStart,
+      OdooLib.OdooDateTime(etching.dateStart),
       productionId,
       etching.consume.filter((x) => x.saved === false && x.btg > 0)
     );
@@ -314,8 +322,24 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
 
   const getWo = async () => {
     const woOrder = await odoo.getWorkOrder(woId);
-    setEtching((prevState) => ({ ...prevState, ...woOrder }));
+    console.log(woOrder.dateEnd);
+    setEtching({...woOrder,
+        dateStart: woOrder.dateStart !== ''
+        ? OdooLib.formatDateTime(woOrder.dateStart)
+        : '',
+        dateEnd: woOrder.dateEnd !== ''
+        ? OdooLib.formatDateTime(woOrder.dateEnd)
+        : '',
+      });
   };
+
+  useEffect(() => {
+    const getDate = async () => {
+      const newDate = await odoo.getDateTolerance(new Date().toISOString());
+      setDate({ ...date, minDate: newDate });
+    };
+    getDate();
+  }, [date.minDate]);
 
   useEffect(() => {
     getWo();
@@ -427,19 +451,25 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
             <Grid item xs={6} md={6} sm={6}>
               <Paper className={classes.paper} elevation={0}>
                 <TextField
-                  id="dateStart"
-                  label="Start Date"
-                  value={
-                    etching.dateStart
-                      ? OdooLib.formatDateTime(etching.dateStart)
-                      : ''
-                  }
-                  className={classes.textField}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  disabled
-                />
+                    id="date_start"
+                    label="Date Start"
+                    type="datetime-local"
+                    value={etching.dateStart ? etching.dateStart : false}
+                    onChange={(e) => {
+                       setEtching({ ...etching, dateStart: e.target.value });
+                    }}
+                    className={classes.textField}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    InputProps={{
+                      readOnly: etching.status !== 'In Progress',
+                      inputProps: {
+                        min: date.minDate,
+                        max: date.maxDate,
+                      },
+                    }}
+                  />
               </Paper>
             </Grid>
           </Grid>
@@ -460,20 +490,26 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
 
             <Grid item xs={6} md={6} sm={6}>
               <Paper className={classes.paper} elevation={0}>
-                <TextField
-                  id="dateFinish"
-                  label="End Date"
-                  value={
-                    etching.dateEnd
-                      ? OdooLib.formatDateTime(etching.dateEnd)
-                      : ''
-                  }
-                  className={classes.textField}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  disabled
-                />
+              <TextField
+                        id="date_end"
+                        label="Date End"
+                        type="datetime-local"
+                        value={etching.dateEnd ? etching.dateEnd : ''}
+                        onChange={(e) => {
+                          setEtching({...etching, dateEnd: e.target.value})
+                        }}
+                        className={classes.textField}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        InputProps={{
+                          readOnly: etching.status !== 'In Progress',
+                          inputProps: {
+                            min: date.minDate,
+                            max: date.maxDate,
+                          },
+                        }}
+                      />
               </Paper>
             </Grid>
             <Grid item xs={6} md={6} sm={6}>
@@ -623,7 +659,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                   <Grid container spacing={3} justify="flex-end">
                     <Button
                       variant="outlined"
-                      color="primary"
+                      
                       disabled={etching.billetSaved}
                       onClick={() => {
                         saveBillet();
@@ -714,7 +750,6 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                   <Grid container spacing={3} justify="flex-end">
                     <Button
                       variant="outlined"
-                      color="primary"
                       className={classes.buttonSaveTab}
                       disabled={etching.produce.length >= 2}
                       onClick={() => {
@@ -724,8 +759,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                       add Scrap
                     </Button>
                     <Button
-                      variant="outlined"
-                      color="primary"
+                      variant="contained"
                       className={classes.buttonSaveTab}
                       onClick={() => {
                         saveProduce();

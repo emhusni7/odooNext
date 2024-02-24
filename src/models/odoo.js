@@ -764,12 +764,12 @@ export default class OdooLib {
     }
   }
 
-  async saveProduceEtc(outputId, produce) {
+  async saveProduceEtc(outputId, produce, dateStart, dateEnd) {
     try {
       const res = await this.executeKW(
         'mrp.production.output',
         'saveProduceEtc',
-        [outputId, produce]
+        [outputId, produce, dateStart,dateEnd]
       );
       return res;
     } catch (e) {
@@ -829,7 +829,7 @@ export default class OdooLib {
       const result = await this.executeKW(
         'mrp.production.output',
         'endEtching',
-        [press.outputId, press.mchID, press.note]
+        [press.outputId, press.mchID, press.note, press.dateStart, press.dateFinished]
       );
       return result;
     } catch (e) {
