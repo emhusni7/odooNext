@@ -322,15 +322,16 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
 
   const getWo = async () => {
     const woOrder = await odoo.getWorkOrder(woId);
-    console.log(woOrder.dateEnd);
-    setEtching({...woOrder,
+    setEtching((prev) => ({
+      ...prev,
+      ...woOrder,
         dateStart: woOrder.dateStart !== ''
         ? OdooLib.formatDateTime(woOrder.dateStart)
         : '',
         dateEnd: woOrder.dateEnd !== ''
         ? OdooLib.formatDateTime(woOrder.dateEnd)
         : '',
-      });
+      }));
   };
 
   useEffect(() => {
