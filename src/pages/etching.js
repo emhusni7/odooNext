@@ -290,11 +290,11 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
       setEtching((prevState) => ({
         ...prevState,
         ...moveLines,
-        dateStart: woOrder.dateStart !== ''
-        ? OdooLib.formatDateTime(woOrder.dateStart)
+        dateStart: moveLines.dateStart !== ''
+        ? OdooLib.formatDateTime(moveLines.dateStart)
         : '',
-        dateEnd: woOrder.dateEnd !== ''
-        ? OdooLib.formatDateTime(woOrder.dateEnd)
+        dateEnd: moveLines.dateEnd !== ''
+        ? OdooLib.formatDateTime(moveLines.dateEnd)
         : '',
       }));
     } else {
