@@ -132,6 +132,9 @@ export default class OdooLib {
     this.getProductCategory = this.getProductCategory.bind(this);
     this.getPrintInvReport = this.printInvReport.bind(this);
     this.getDateTolerance = this.getDateTolerance.bind(this);
+    this.addScrap = this.addScrap.bind(this);
+    this.getFinishedScrap = this.getFinishedScrap.bind(this);
+    this.actionDoneScrap = this.actionDoneScrap.bind(this);
   }
 
   login(username, password) {
@@ -764,12 +767,12 @@ export default class OdooLib {
     }
   }
 
-  async saveProduceEtc(outputId, produce, dateStart, dateEnd) {
+  async saveProduceEtc(outputId, produce, dateStart, dateEnd, downtime_start, downtime_end, reason) {
     try {
       const res = await this.executeKW(
         'mrp.production.output',
         'saveProduceEtc',
-        [outputId, produce, dateStart,dateEnd]
+        [outputId, produce, dateStart,dateEnd, downtime_start, downtime_end, reason]
       );
       return res;
     } catch (e) {
@@ -829,7 +832,7 @@ export default class OdooLib {
       const result = await this.executeKW(
         'mrp.production.output',
         'endEtching',
-        [press.outputId, press.mchID, press.note, press.dateStart, press.dateFinished]
+        [press.outputId, press.mchID, press.note, press.dateStart, press.dateEnd, press.downtime_start,press.downtime_end,press.downtime_reason]
       );
       return result;
     } catch (e) {
@@ -1661,12 +1664,12 @@ export default class OdooLib {
     }
   }
 
-  async getQcExport(name) {
+  async getQcExport(name, wcType) {
     try {
       const result = await this.executeKW(
         'mrp.production.output',
         'getQCexport',
-        [false, name]
+        [false, name, wcType]
       );
       return result;
     } catch (e) {
@@ -1739,7 +1742,7 @@ export default class OdooLib {
     return true;
   }
 
-  async printSaved(pickId, totalC, totalF, reportId, printHost) {
+  async printSaved(pickId, totalC, totalF, reportId, printHost, dateTransfer) {
     try {
       const res = await this.executeKW('stock.picking', 'printSaved', [
         pickId,
@@ -1749,6 +1752,19 @@ export default class OdooLib {
         printHost,
         localStorage.getItem('lotMchId'),
         localStorage.getItem('shiftId'),
+        dateTransfer
+      ]);
+      return res;
+    } catch (e) {
+      return e;
+    }
+  }
+
+  async actionDoneScrap(pickId, dateTransfer) {
+    try {
+      const res = await this.executeKW('stock.picking', 'actionDoneScrap', [
+        pickId,
+        dateTransfer,
       ]);
       return res;
     } catch (e) {
@@ -2020,11 +2036,56 @@ export default class OdooLib {
     }
   }
 
+  async getFinishedScrap(pickingId) {
+    try {
+      const pick = await this.executeKW('stock.picking', 'read', [
+        [Number(pickingId)],
+        ['move_lines', 'picking_type_id',  'name', 'date_done', 'shift_id'],
+      ]);
+
+      const consume = await this.executeKW('stock.move', 'read', [
+        pick[0].move_lines,
+        [
+          'name',
+          'product_id',
+          'product_uom_qty',
+          'type_bundle',
+          'id',
+          'restrict_lot_id',
+          'product_uom',
+          'note',
+        ],
+      ]);
+      const type = await this.executeKW('stock.picking.type', 'read', [
+        pick[0].picking_type_id[0],
+        [
+          'id',
+          'name',
+          'default_location_src_id',
+          'default_location_dest_id',
+          'default_location_prod_id',
+        ],
+      ]);
+
+      const shift = await this.executeKW('res.shift', 'read', [
+        pick[0].shift_id[0],
+        [
+          'id',
+          'name',
+        ],
+      ]);
+      
+      return { type, moves: consume,  name: pick[0].name, dateTransfer: pick[0].date_done, shift };
+    } catch (e) {
+      return e;
+    }
+  }
+
   async getFinished(pickingId) {
     try {
       const pick = await this.executeKW('stock.picking', 'read', [
         [Number(pickingId)],
-        ['finished', 'picking_type_id', 'consume', 'name'],
+        ['finished', 'picking_type_id', 'consume', 'name', 'date_done'],
       ]);
       const consume = await this.executeKW('stock.move', 'read', [
         pick[0].consume,
@@ -2039,7 +2100,7 @@ export default class OdooLib {
       ]);
       const moves = await this.executeKW('stock.move', 'read', [
         pick[0].finished,
-        ['name', 'product_id', 'product_uom_qty', 'id', 'restrict_lot_id'],
+        ['name', 'product_id', 'product_uom_qty', 'id', 'restrict_lot_id','type_bundle'],
       ]);
       const type = await this.executeKW('stock.picking.type', 'read', [
         pick[0].picking_type_id[0],
@@ -2051,7 +2112,8 @@ export default class OdooLib {
           'default_location_prod_id',
         ],
       ]);
-      return { type, moves, consume, name: pick[0].name };
+      
+      return { type, moves, consume, name: pick[0].name, dateTransfer: pick[0].date_done };
     } catch (e) {
       return e;
     }
@@ -2080,6 +2142,42 @@ export default class OdooLib {
     }
   }
 
+  async addScrap(
+    pickingId,
+    type,
+    productId,
+    productName,
+    qty,
+    locId,
+    destId,
+    dateTransfer,
+    locProdId,
+    typeBundle,
+    note,
+    uomId
+  ) {
+    try {
+      const res = await this.executeKW('stock.picking', 'addScrapNew', [
+        pickingId,
+        type,
+        productId,
+        productName,
+        qty,
+        locId,
+        destId,
+        dateTransfer,
+        locProdId,
+        typeBundle,
+        note,
+        uomId,
+      ]);
+      return res;
+    } catch (e) {
+      return e;
+    }
+  }
+
+
   async addPackingConsume(
     pickingId,
     type,
@@ -2090,7 +2188,8 @@ export default class OdooLib {
     destId,
     prodId,
     lotId,
-    uomId
+    uomId,
+    dateTransfer
   ) {
     try {
       const res = await this.executeKW('stock.picking', 'addPackingConsume', [
@@ -2104,6 +2203,7 @@ export default class OdooLib {
         prodId,
         lotId,
         uomId,
+        dateTransfer
       ]);
       return res;
     } catch (e) {
@@ -2152,7 +2252,8 @@ export default class OdooLib {
     prodId,
     lotId,
     uomId,
-    qtyMultiply
+    qtyMultiply,
+    typeBundle
   ) {
     try {
       const res = await this.executeKW('stock.picking', 'addPackingProduce', [
@@ -2167,6 +2268,7 @@ export default class OdooLib {
         lotId,
         uomId,
         qtyMultiply,
+        typeBundle
       ]);
       return res;
     } catch (e) {
@@ -2309,7 +2411,7 @@ export default class OdooLib {
         [
           [
             ['name', 'ilike', filtername],
-            ['code', 'in', ['production', 'manufact']],
+            ['code', 'in', ['production', 'manufact', 'internal']],
           ],
         ],
         {

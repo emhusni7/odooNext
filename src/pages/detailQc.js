@@ -9,7 +9,7 @@ import React, { forwardRef } from 'react';
 import Head from 'next/dist/next-server/lib/head';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import MaterialTable, { MTableEditField } from 'material-table';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import Check from '@material-ui/icons/Check';
@@ -29,6 +29,7 @@ import ViewColumn from '@material-ui/icons/ViewColumn';
 import AsyncSelect from 'react-select/async';
 
 import OdooLib from '../models/odoo';
+import { object } from 'prop-types';
 
 const tableIcons = {
   Check: forwardRef((props, ref) => <Check ref={ref} />),
@@ -100,6 +101,19 @@ const DetailQcPage = ({ record, idx, addScrap, msg, enabled }) => {
   const [mvLine, setMvLine] = React.useState(record[idx]);
   const filterValue = (inputValue) => odoo.getProductAll(inputValue);
   // eslint-disable-next-line no-unused-vars
+  function renderName(rowData) {
+    switch(rowData.resultType) {
+      case 'm-potong':
+        return 'Mutasi Potong';
+      case 'm-finish':
+        return 'Mutasi Finish';
+      case 'r-proses':
+        return 'Reproses';
+      default:
+        return 'Scrap';
+    }
+  }
+
   const [state, setState] = React.useState({
     columns: [
       {
@@ -115,6 +129,40 @@ const DetailQcPage = ({ record, idx, addScrap, msg, enabled }) => {
       {
         field: 'uomId',
         hidden: true,
+      },
+      {
+        title: 'Type',
+        field: 'resultType',
+        required: true,
+        render: renderName,
+        width: '20%',
+        editComponent: (props) => (
+          
+        <Autocomplete
+          options={['scrap','m-potong','m-finish','r-proses']
+          }
+          onChange={(event, value) => {
+            if (value){  
+              props.rowData.resultType = value
+            }
+          }}
+          id="resultType"
+          getOptionSelected={(option, value) => option === value}
+          getOptionLabel={(option) => {
+            switch(option) {
+              case 'm-potong':
+                return 'Mutasi Potong';
+              case 'm-finish':
+                return 'Mutasi Finish';
+              case 'r-proses':
+                return 'Reproses';
+              default:
+                return 'Scrap';
+            }
+          }}
+          
+          renderInput={(params) => <TextField {...params} required={true} error={true} label="Type" margin="normal" />}
+        />)
       },
       {
         title: 'Scrap Qty',
@@ -135,6 +183,7 @@ const DetailQcPage = ({ record, idx, addScrap, msg, enabled }) => {
             cacheOptions
             required
             defaultOptions
+            
             style={{ width: '100px' }}
             onChange={(value) => {
               if (value) {
@@ -161,25 +210,39 @@ const DetailQcPage = ({ record, idx, addScrap, msg, enabled }) => {
     // eslint-disable-next-line consistent-return
     onRowAdd: (newData) =>
       new Promise((resolve, reject) => {
-        msg({ variant: 'success', message: '' });
-        if (!newData.scrapQty || !newData.note) {
-          msg({ variant: 'error', message: 'Required Field' });
+        msg({ variant: 'success', message: '...' });
+        if (!newData.scrapQty) {
+          msg({ variant: 'error', message: 'Field Isian Qty Scrap Harus Di Isi' });
           return reject();
+        } else if (!newData.note) {
+          msg({ variant: 'error', message: 'Field Note Harus Di Isi' });
+          return reject();
+        } else if (!newData.resultType) {
+          msg({ variant: 'error', message: 'Field Type Harus Di Isi' });
+          return reject(); }
+
+        if (['m-potong','m-finish'].includes(newData.resultType)){
+          if (!newData.productName){
+            msg({ variant: 'error', message: 'Produk Harus Diisi di pilihan Mutasi' });
+            return reject();
+          }
         }
+
         if (newData.scrapQty > mvLine.qty) {
-          msg({ variant: 'error', message: 'Over Qty' });
+          msg({ variant: 'error', message: 'Qty Lebih' });
           return reject();
         }
         setTimeout(() => {
+          
           const rqty = mvLine.qty - newData.scrapQty;
           const scrapqty = Number(mvLine.scrapqty) + Number(newData.scrapQty);
           const mv = [...mvLine.lines, newData];
-          setMvLine((prev) => ({
-            ...prev,
+          setMvLine({
+            ...mvLine,
             qty: rqty,
             scrapqty,
             lines: mv,
-          }));
+          });
           resolve(addScrap(idx, newData, scrapqty, 'add'));
         }, 300);
       }),
@@ -217,7 +280,7 @@ const DetailQcPage = ({ record, idx, addScrap, msg, enabled }) => {
               id="product"
               className={classes.textFieldProduct}
               value={mvLine.name_product}
-              disabled
+              inputProps={{readOnly: true}}
             />
           </Grid>
           <Grid item xs={4} md={4} sm={4}>
@@ -225,7 +288,7 @@ const DetailQcPage = ({ record, idx, addScrap, msg, enabled }) => {
               id="prdQty"
               className={classes.textFieldProduct}
               value={mvLine.qty}
-              disabled
+              inputProps={{readOnly: true}}
             />
           </Grid>
         </Grid>

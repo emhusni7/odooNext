@@ -597,7 +597,7 @@ const BajaTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
             <Grid item xs={3} md={3} sm={3}>
               <Button
                 variant="outlined"
-                color="primary"
+                color="secondary"
                 type="button"
                 disabled={!picking.lot_id || disabled}
                 onClick={() => addItem()}
@@ -621,7 +621,7 @@ const BajaTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
           <Grid item xs={4} md={4} sm={4}>
             <Button
               variant="contained"
-              color="primary"
+              color="secondary"
               type="button"
               disabled={disabled || picking.moves.length === 0}
               onClick={() => onValidate(tableRef)}
@@ -634,7 +634,7 @@ const BajaTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
               disabled={!disabled && !picking.name}
               type="button"
               variant="outlined"
-              color="primary"
+              color="secondary"
               onClick={() => actReload()}
             >
               Reload

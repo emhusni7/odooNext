@@ -94,7 +94,7 @@ const CorrActDialog = ({
       <Button
         variant="outlined"
         disabled={disabled}
-        color="primary"
+        color="secondary"
         onClick={handleClickOpen}
       >
         Create Action
@@ -234,7 +234,7 @@ const CorrActDialog = ({
                 <Button
                   onClick={handleClose}
                   variant="contained"
-                  color="primary"
+                  color="secondary"
                   disabled={disabled}
                 >
                   Save

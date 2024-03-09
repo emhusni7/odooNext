@@ -234,7 +234,7 @@ const StepForm = ({
                 </Button>
                 <Button
                   variant="contained"
-                  color="primary"
+                  color="secondary"
                   onClick={handleNext}
                   className={classes.button}
                 >

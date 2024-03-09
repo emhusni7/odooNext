@@ -52,7 +52,7 @@ const SPBCard = ({ noSpb, noPo, Supplier, id }) => (
       </Link>
     </CardActionArea>
     <CardActions>
-      {/* <Button size="small" color="primary"> */}
+      {/* <Button size="small" color="secondary"> */}
       <Link href={`/edit?id=${id}`}>
         <a>Edit</a>
       </Link>

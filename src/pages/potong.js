@@ -436,8 +436,8 @@ const BubutPage = ({ setTitle, setMsgBox, setLoading }) => {
                 <Tabs
                   value={value}
                   onChange={handleChange}
-                  indicatorColor="primary"
-                  textColor="primary"
+                  indicatorcolor="secondary"
+                  textcolor="secondary"
                   variant="scrollable"
                   scrollButtons="auto"
                   aria-label="scrollable auto tabs example"

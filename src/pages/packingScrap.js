@@ -14,6 +14,7 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import TableHead from '@material-ui/core/TableHead';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
@@ -26,10 +27,6 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     marginLeft: '10px',
     marginRight: '10px',
-  },
-  button: {
-    width: '100%',
-    margin: 10,
   },
   table: {
     width: '100%',
@@ -50,6 +47,27 @@ const useStyles = makeStyles((theme) => ({
   textField: {
     width: '100%',
     marginTop: 10,
+  },
+  buttonSaved: {
+    width: '100%',
+    margin: 10,
+    fontWeight: 'bold',
+    backgroundColor: 'blue',
+    color: 'white',
+  },
+  button: {
+    width: '100%',
+    margin: 10,
+    fontWeight: 'bold',
+    backgroundColor: 'red',
+    color: 'white',
+  },
+  buttonCancel: {
+    width: '100%',
+    margin: 10,
+    backgroundColor: 'red',
+    fontWeight: 'bold',
+    color: 'white',
   },
   paperButton: {
     marginTop: 10,
@@ -84,47 +102,72 @@ const useStyles = makeStyles((theme) => ({
     marginRight: 10,
     marginTop: 10,
   },
+  disabledButton: {
+    backgroundColor: theme.palette.primary || 'red'
+  },
 }));
 
 const customStyles = {
   option: (provided, state) => ({
     ...provided,
-    color: state.isSelected ? 'yellow' : 'black',
-    backgroundColor: state.isSelected ? 'green' : 'white',
+    fontWeight: 'bold',
+    color: state.isSelected ? 'white' : 'black',
+    backgroundColor: state.isSelected ? 'blue' : 'white ',
+    "&:hover": {
+      backgroundColor: "#2574f4"
+    }
   }),
   control: (provided) => ({
     ...provided,
+    color: 'black',
+    fontWeight: 'bold',
+    borderColor: '#2574f4',
     marginTop: '3%',
   }),
+  placeholder: (defaultStyles) => {
+    return {
+        ...defaultStyles,
+        color: 'red',
+    }
+}
 };
 
 const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
   const classes = useStyles();
   const odoo = new OdooLib();
+  const [date, setDate] = React.useState({
+    minDate: OdooLib.MinDateTime(new Date().toISOString()),
+    maxDate: OdooLib.CurrentTime(new Date().toISOString()),
+  });
+
+  React.useEffect(() => {
+    const getDate = async () => {
+      const newDate = await odoo.getDateTolerance(new Date().toISOString());
+      setDate({ ...date, minDate: newDate });
+    };
+    getDate();
+  }, [date.minDate]);
+
   const [mvLine, setMvLine] = React.useState({
-    productName: '',
-    productprdcName: '',
-    lotId: 0,
-    lotName: '',
+    productId: 0,
+    productName: '--Product--',
     uomId: false,
-    lotprdcName: '',
-    uomprdcId: false,
     locId: 0,
     typeId: 0,
+    shiftId: false,
     qty: 0,
     qtyTotal: 0,
+    dateTransfer: new Date(),
     pickingId: false,
     typeError: '',
     productError: '',
-    lotError: '',
     qtyError: '',
-    qtyTotalError: '',
-    lines: [],
-    consume: [],
-    reportId: false,
-    reportLabel: false,
-    reportError: '',
-    qtyMultiply: 1,
+    qtyScrapError: '',
+    dateError: '',
+    typeBundleError: '',
+    shiftIdError: '',
+    note: '',
+    consume: []
   });
   const [opt, setOpt] = React.useState({
     optionsLoaded: false,
@@ -132,28 +175,21 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
     isLoading: false,
   });
 
-  const handleLoadOptions = async () => {
-    const res = await odoo.getQuant('', mvLine.locId, mvLine.productId);
-    setTimeout(() => {
-      setOpt({
-        optionsLoaded: true,
-        options: res,
-        isLoading: false,
-      });
-    }, 500);
-  };
+  const [pack, setPacking] = React.useState([]);
 
-  const maybeLoadOptions = () => {
-    if (!opt.optionsLoaded) {
-      setOpt({ ...opt, isLoading: true });
-      handleLoadOptions();
-    }
-  };
+  const packData = [{value: 'inter', title: 'INTERLIVE PLASTIK / KERTAS'},
+  {value: 'msn', title: 'MESIN SELONGSONG PLASTIK'},
+  {value: 'bdl', title: 'BANDELING'},
+  {value: 'box', title: 'BOX'},
+  {value: 'pt', title: 'PETIAN'},
+  {value: 'pk', title: 'PROTEK'},
+  {value: 'gl', title: 'GLANGSING'},
+  {value: 'shring', title: 'PLASTIK SHRING'}
+]
 
   const getFinished = async (pickId) => {
     setLoading(true);
-    const result = await odoo.getFinished(pickId);
-    // eslint-disable-next-line no-unused-vars
+    const result = await odoo.getFinishedScrap(pickId);
     let mv = false;
     if (result.consume) {
       // eslint-disable-next-line prefer-destructuring
@@ -165,94 +201,121 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
       ...mvLine,
       typeId: pickType.id,
       typeName: pickType.name,
+      dateTransfer: OdooLib.CurrentTime(result.dateTransfer),
       locId: pickType.default_location_src_id[0],
       locDestId: pickType.default_location_dest_id[0],
-      locProdId: pickType.default_location_prod_id[0],
-      pickingId: Number(localStorage.getItem('pickingProdId')),
-      lines: result.moves.map((x) => {
+      pickingId: Number(localStorage.getItem('pickScId')),
+      productId: mv ? mv.product_id[0] : 0,
+      productName: mv ? mv.product_id[1] : '---Product---',
+      uomId: mv ? mv.product_uom[0] : '',
+      shiftId: false,
+      consume: result.moves.map((x) => {
         return {
           productQty: x.product_uom_qty,
           name: x.name,
+          type_bundle: x.type_bundle,
+          note: x.note,
           id: x.id,
-          lot: x.restrict_lot_id[1],
         };
       }),
-      consume: result.consume.map((x) => {
-        return {
-          productQty: x.product_uom_qty,
-          name: x.name,
-          id: x.id,
-          lot: x.restrict_lot_id[1],
-        };
-      }),
+      
     });
     setLoading(false);
   };
 
   React.useEffect(() => {
-    let loc = localStorage.getItem('pickingProdId');
-    if (loc) {
+    let loc = localStorage.getItem('pickScId');
+    if (!!loc){
       getFinished(loc);
     }
+    
     return () => {
       loc = false;
     };
   }, []);
   const [disable, setDisable] = React.useState(false);
   const [validate, setValidate] = React.useState(false);
+  const [printLoading, setPrintLoading] = React.useState(false);
   const filterValue = (inputValue) => odoo.getProductAll(inputValue);
+  const pickingVal = () => odoo.getPickingTypeProd('Packing Scrap');
+  
+  React.useEffect(() => {
+    if (!!mvLine.typeName){
+      if (mvLine.typeName.includes('Export')){
+        setPacking([
+          {value: 'inter', title: 'INTERLIVE PLASTIK / KERTAS'},
+          {value: 'msn', title: 'MESIN SELONGSONG PLASTIK'},
+          {value: 'bdl', title: 'BANDELING'},
+          {value: 'box', title: 'BOX'},
+          {value: 'pt', title: 'PETIAN'}
+        ])
+      } else {
+        setPacking([
+        {value: 'pk', title: 'PROTEK'},
+        {value: 'gl', title: 'GLANGSING'},
+        {value: 'bdl', title: 'BANDELING'},
+        {value: 'shring', title: 'PLASTIK SHRING'}])
+      }
+    } 
+   
+  }, [mvLine.typeName])
+ 
 
-  const pickingVal = (inVal) => odoo.getPickingTypeProd(inVal);
   const handleSubmit = async () => {
     setMsgBox({ variant: 'success', message: '' });
-
-    setLoading(true);
-    setDisable(true);
-    const res = await odoo.actValidate(
-      mvLine.pickingId,
-      // eslint-disable-next-line no-use-before-define
-      TotalConsume,
-      // eslint-disable-next-line no-use-before-define
-      Total
-    );
-    if (!res.faultCode) {
-      setTitle(res.name);
-      setMsgBox({ variant: 'success', message: 'Data Has Been Saved' });
-      setLoading(false);
-      setValidate(true);
-      localStorage.removeItem('pickingProdId');
-    } else {
-      setMsgBox({ variant: 'error', message: res.message });
-      setLoading(false);
-      setDisable(false);
-    }
+      setLoading(true);
+      setDisable(true);
+      setPrintLoading(true);
+      const res = await odoo.actionDoneScrap(
+        mvLine.pickingId,
+        odooLib.OdooDateTime(mvLine.dateTransfer),
+      );
+      if (!res.faultCode) {
+        setTitle(res.name);
+        setMvLine((prev) => ({ ...prev, consume: res.lines }));
+        setMsgBox({ variant: 'success', message: 'Data Has Been Saved' });
+        setLoading(false);
+        setValidate(true);
+        setPrintLoading(false);
+        localStorage.removeItem('pickScId');
+      } else {
+        setMsgBox({ variant: 'error', message: res.message });
+        setLoading(false);
+        setDisable(false);
+      }
   };
 
-  const addPackingConsume = async () => {
+  const addScrap = async () => {
     setMsgBox({ variant: 'success', message: '' });
     if (!mvLine.typeId) {
       setMvLine({ ...mvLine, typeError: 'required Field' });
     } else if (!mvLine.productId) {
       setMvLine({ ...mvLine, productError: 'required Field' });
-    } else if (!mvLine.qtyTotal) {
-      setMvLine({ ...mvLine, qtyTotalError: 'required Field' });
-    } else {
+    } else if (!mvLine.qtyScrap) {
+      setMvLine({ ...mvLine, qtyScrapError: 'required Field' });
+    } else if (!mvLine.dateTransfer) {
+      setMvLine({ ...mvLine, dateError: 'required Field' });
+    } else if (!mvLine.typeBundle) {
+      setMvLine({ ...mvLine, typeBundleError: 'required Field' });
+    }  else {
       setLoading(true);
-      const vals = await odoo.addPackingConsume(
+      const vals = await odoo.addScrap(
         mvLine.pickingId,
         mvLine.typeId,
         mvLine.productId,
         mvLine.productName,
-        mvLine.qtyTotal,
+        mvLine.qtyScrap,
         mvLine.locId,
         mvLine.locDestId,
+        OdooLib.OdooDateTime(mvLine.dateTransfer),
         mvLine.locProdId,
-        mvLine.lotId,
+        mvLine.typeBundle.value,
+        mvLine.note,
         mvLine.uomId
       );
       if (!vals.faultCode) {
-        if (!localStorage.getItem('pickingProdId')) {
-          localStorage.setItem('pickingProdId', vals.pickingId);
+        if (!localStorage.getItem('pickScId')) {
+          localStorage.setItem('pickScId', vals.pickingId);
         }
         setTitle(vals.name);
         setMvLine({
@@ -262,9 +325,9 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
             ...mvLine.consume,
             {
               name: mvLine.productName,
-              product: mvLine.productId,
-              lot: mvLine.lotName,
-              productQty: mvLine.qtyTotal,
+              productQty: mvLine.qtyScrap,
+              type_bundle: mvLine.typeBundle.value,
+              note: mvLine.note,
               id: vals.moveId,
             },
           ],
@@ -283,7 +346,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
     const res = await odoo.actCancel(mvLine.pickingId);
     setLoading(false);
     if (!res.faultCode) {
-      localStorage.removeItem('pickingProdId');
+      localStorage.removeItem('pickScId');
     } else {
       setMsgBox({ variant: 'error', message: res.message });
     }
@@ -295,7 +358,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
     if (!mvLine.qty) {
       setMvLine({ ...mvLine, qtyError: 'required Field' });
       // eslint-disable-next-line no-use-before-define
-    } else if (TotalConsume < Total + mvLine.qty) {
+    } else if (TotalConsume < Total + mvLine.qty * mvLine.qtyMultiply) {
       await setTimeout(setLoading(false), 1000);
       setMsgBox({
         variant: 'error',
@@ -303,36 +366,28 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
       });
     } else {
       setLoading(true);
-      const vals = await odoo.addProduce(
+      const vals = await odoo.addPackingProduce(
         mvLine.pickingId,
         mvLine.typeId,
-        mvLine.productprdcId,
-        mvLine.productprdcName,
+        mvLine.productId,
+        mvLine.productName,
         mvLine.qty,
         mvLine.locId,
         mvLine.locDestId,
         mvLine.locProdId,
-        mvLine.lotprdcName,
-        mvLine.uomprdcId
+        mvLine.lotId,
+        mvLine.uomId,
+        mvLine.qtyMultiply
       );
       if (!vals.faultCode) {
-        if (!localStorage.getItem('pickingProdId')) {
-          localStorage.setItem('pickingProdId', vals.pickingId);
+        if (!localStorage.getItem('pickScId')) {
+          localStorage.setItem('pickScId', vals.pickingId);
         }
 
         setMvLine({
           ...mvLine,
           pickingId: vals.pickingId,
-          lines: [
-            ...mvLine.lines,
-            {
-              name: mvLine.productprdcName,
-              product: mvLine.productprdcId,
-              lot: mvLine.lotprdcName,
-              productQty: mvLine.qty,
-              id: vals.moveId,
-            },
-          ],
+          lines: [...mvLine.lines, ...vals.lines],
         });
         setLoading(false);
         setMsgBox({ variant: 'success', message: 'Data has been add' });
@@ -369,7 +424,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
             style={{ mariginTop: 30 }}
           >
             <Grid container spacing={1}>
-              <Grid item xs={12} md={4} sm={4}>
+              <Grid item xs={4} md={4} sm={6}>
                 {validate ? (
                   <Button
                     className={classes.button}
@@ -388,10 +443,10 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
           </Typography>
           <Paper className={classes.paperType}>
             <Grid container spacing={1}>
-              <Grid item xs={12} md={4} sm={4}>
-                {localStorage.getItem('pickingProdId') ? (
+              <Grid item xs={6} md={6} sm={12}>
+                {localStorage.getItem('pickScId') ? (
                   <TextField
-                    id="typeId"
+                    id="typeIdTest"
                     value={mvLine.typeName}
                     autoFocus
                     className={classes.textFieldProduct}
@@ -406,7 +461,6 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                     cacheOptions
                     required
                     defaultOptions
-                    isClearable
                     placeholder="Picking Type"
                     styles={customStyles}
                     onChange={async (value) => {
@@ -424,15 +478,6 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                           locDestId: value.locDestId[0],
                           locProdId: value.locProdId[0],
                         });
-                      } else {
-                        setMvLine({
-                          ...mvLine,
-                          typeId: '',
-                          typeName: '',
-                          locId: '',
-                          locDestId: '',
-                          locProdId: '',
-                        });
                       }
                     }}
                     loadOptions={pickingVal}
@@ -449,16 +494,50 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                   )}
                 </div>
               </Grid>
-              <Grid item xs={12} md={4} sm={4}>
+              <Grid item xs={6} md={6} sm={12}>
+              <TextField
+                  id="dateTransfer"
+                  placeholder='Date Transfer'
+                  type="datetime-local"
+                  value={mvLine.dateTransfer ? mvLine.dateTransfer : ''}
+                  onChange={(e) => {
+                    setMvLine({ ...mvLine, dateTransfer: e.target.value });
+                  }}
+                  className={classes.textField}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  InputProps={{
+                    // readOnly: mvLine.status === 'Done',
+                    inputProps: {
+                      min: date.minDate,
+                      max: date.maxDate,
+                    },
+                  }}
+                /><div>
+                {mvLine.dateError && (
+                  <div
+                    style={{ fontSize: '12px', color: 'rgb(244, 67, 54)' }}
+                  >
+                    Required
+                  </div>
+                )}
+              </div>
+              </Grid>
+              <Grid item xs={6} md={6} sm={12}>
                 <AsyncSelect
                   id="productName"
                   name="productName"
                   cacheOptions
                   required
                   defaultOptions
-                  isClearable
+                  value={{
+                    label: mvLine.productName,
+                    value: mvLine.productId,
+                    uomId: mvLine.uomId,
+                  }}
                   isDisabled={disable}
-                  placeholder="Product To Consume"
+                  placeholder="Product"
                   styles={customStyles}
                   onChange={async (value) => {
                     if (value) {
@@ -472,19 +551,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                         productId: value.value,
                         productName: value.label,
                         uomId: value.uom_id[0],
-                        lotId: 0,
-                        lotName: '',
-                        qty: 0,
-                        qtyTotal: 0,
-                      });
-                    } else {
-                      setMvLine({
-                        ...mvLine,
-                        productId: '',
-                        productName: '',
-                        uomId: '',
-                        lotId: 0,
-                        lotName: '',
+                       
                         qty: 0,
                         qtyTotal: 0,
                       });
@@ -502,68 +569,67 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                   )}
                 </div>
               </Grid>
-              <Grid item xs={12} md={4} sm={4}>
-                <Select
-                  id="lotName"
-                  name="lotName"
-                  searchable
-                  isDisabled={disable}
-                  required
-                  isClearable
-                  placeholder="Lot Consume"
-                  styles={customStyles}
-                  isLoading={opt.isLoading}
-                  options={opt.options}
-                  onFocus={() => maybeLoadOptions()}
-                  onChange={(value) => {
-                    if (value) {
-                      setMvLine({
-                        ...mvLine,
-                        lotId: value.value,
-                        lotName: value.label,
-                        qty: value.pack,
-                        qtyTotal: value.qty,
-                      });
-                    } else {
-                      setMvLine({
-                        ...mvLine,
-                        lotId: '',
-                        lotName: '',
-                        qty: '',
-                        qtyTotal: '',
-                      });
-                    }
+              <Grid item xs={6} md={6} sm={6}>
+              <Autocomplete
+                  options={pack}
+                  onChange={(event, value) => {
+                    setMvLine({...mvLine,
+                      typeBundle: value
+                    })
                   }}
+                  id="typeBundle"
+                  name="typeBundle"
+                  getOptionLabel={(val) => val.title }
+                  renderInput={(params) => <TextField {...params} required={true} error={!!mvLine.typeBundleError} label="Jenis Packing" margin="normal" />}
                 />
-                <div>
-                  {mvLine.lotError && (
-                    <div
-                      style={{ fontSize: '12px', color: 'rgb(244, 67, 54)' }}
-                    >
-                      Required
-                    </div>
-                  )}
-                </div>
               </Grid>
             </Grid>
             <Grid container spacing={1}>
-              <Grid item xs={6} md={6} sm={6}>
-                <TextField
-                  id="qtyTotal"
-                  className={classes.textFieldTypeInput}
-                  value={mvLine.qtyTotal}
-                  onChange={(e) =>
-                    setMvLine({ ...mvLine, qtyTotal: Number(e.target.value) })
+            {/* <Grid item xs={3} md={3} sm={6}>
+            <Autocomplete
+                  id="shift"
+                  name="Shift"
+                  options={[{'value':1, title:'Shift 1'},{'value':2, title:'Shift 2'},{'value':3, title:'Shift 3'}]}
+                  openOnFocus
+                  placeholder='Shift'
+                  onChange={(event, val) => { 
+                    if(val){
+                      setMvLine({
+                        ...mvLine,
+                        shiftId: val
+                      })
+                    } else {
+                      setMvLine({
+                        ...mvLine,
+                        shiftId: ''
+                      })
+                    }
+                  } 
                   }
-                  onFocus={() => setMvLine({ ...mvLine, qtyTotal: '' })}
+                  value={mvLine.shiftId}
+                  getOptionLabel={(val) => val.title }
+                  renderInput={(params) => (
+                    <TextField {...params} label="Shift" error={!!mvLine.shiftIdError} required variant="standard" />
+                  )}
+                />
+            </Grid> */}
+            <Grid item xs={3} md={3} sm={6}>
+                <TextField
+                  id="qtyScrap"
+                  className={classes.textFieldTypeInput}
+                  value={mvLine.qtyScrap}
+                  onChange={(e) =>
+                    setMvLine({ ...mvLine, qtyScrap: Number(e.target.value) })
+                  }
+                  onFocus={() => setMvLine({ ...mvLine, qtyScrap: '' })}
                   InputProps={{
                     readOnly: false,
                   }}
-                  label="Qty Total"
+                  label="Qty Scrap"
                   type="number"
                 />
                 <div>
-                  {mvLine.qtyTotalError && (
+                  {mvLine.qtyScrapError && (
                     <div
                       style={{ fontSize: '12px', color: 'rgb(244, 67, 54)' }}
                     >
@@ -572,17 +638,36 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                   )}
                 </div>
               </Grid>
-              <Grid item xs={6} md={6} sm={6}>
+              
+              <Grid item xs={3} md={3} sm={6}>
+                <TextField
+                    // error
+                    id="note"
+                    label="Note"
+                    onChange={(e) => {
+                      setMvLine({
+                        ...mvLine,
+                        note: e.target.value
+                      })
+                    }}
+                    value={mvLine.note}
+                    helperText="Catatan Scrap"
+                    variant="filled"
+                    style={{width: '100%'}}
+                  />
+              </Grid>
+              <Grid item xs={2} md={2} sm={6}>
                 <Button
-                  variant="outlined"
-                  color="secondary"
+                  variant="contained"
+                  color="red"
                   className={classes.button}
                   disabled={disable}
-                  onClick={() => addPackingConsume()}
+                  onClick={() => addScrap()}
                 >
-                  Add Consume
+                  Add Scrap
                 </Button>
               </Grid>
+              
             </Grid>
             <Grid container style={{ marginTop: '5px' }} spacing={4}>
               <Grid item xs={12} md={12} sm={12}>
@@ -595,7 +680,8 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                     <TableHead>
                       <TableRow>
                         <TableCell align="left">Product</TableCell>
-                        <TableCell align="left">Lot</TableCell>
+                        <TableCell align="center">Type Scrap</TableCell>
+                        <TableCell align="center">Note</TableCell>
                         <TableCell align="right">Qty</TableCell>
                         <TableCell align="center">Action</TableCell>
                       </TableRow>
@@ -604,7 +690,10 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                       {mvLine.consume.map((row, index) => (
                         <TableRow key={row.id}>
                           <TableCell align="left">{row.name}</TableCell>
-                          <TableCell align="left">{row.lot}</TableCell>
+                          <TableCell align="center">{
+                           packData.find((y) => y.value===row.type_bundle).title
+                          }</TableCell>
+                          <TableCell align='center'>{row.note}</TableCell>
                           <TableCell align="right">{row.productQty}</TableCell>
                           <TableCell align="center">
                             <IconButton
@@ -648,214 +737,35 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                     </TableBody>
                     <TableRow>
                       {/* <TableCell rowSpan={1} /> */}
-                      <TableCell colSpan={2}>Subtotal Consume</TableCell>
+                      <TableCell colSpan={3}>Subtotal </TableCell>
                       <TableCell align="right">{TotalConsume}</TableCell>
                     </TableRow>
                   </Table>
                 </TableContainer>
                 <br />
                 <br />
+                
+                
                 <Grid container spacing={1}>
-                  <Grid item xs={12} md={6} sm={6}>
-                    <AsyncSelect
-                      id="productProduce"
-                      name="productProduce"
-                      cacheOptions
-                      required
-                      defaultOptions
-                      isClearable
-                      isDisabled={disable}
-                      placeholder="Product to Produce"
-                      styles={customStyles}
-                      onChange={async (value) => {
-                        if (value) {
-                          setOpt({
-                            ...opt,
-                            options: [],
-                            optionsLoaded: false,
-                          });
-                          setMvLine({
-                            ...mvLine,
-                            productprdcId: value.value,
-                            productprdcName: value.label,
-                            uomprdcId: value.uom_id[0],
-                            lotprdcName: '',
-                            qty: 0,
-                            qtyTotal: 0,
-                          });
-                        } else {
-                          setMvLine({
-                            ...mvLine,
-                            productprdcId: '',
-                            productprdcName: '',
-                            uomprdcId: '',
-                            lotprdcName: '',
-                            qty: 0,
-                            qtyTotal: 0,
-                          });
-                        }
-                      }}
-                      loadOptions={filterValue}
-                    />
-                    <div>
-                      {mvLine.productError && (
-                        <div
-                          style={{
-                            fontSize: '12px',
-                            color: 'rgb(244, 67, 54)',
-                          }}
-                        >
-                          Required
-                        </div>
-                      )}
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} md={6} sm={6}>
-                    <TextField
-                      id="lotPrdcName"
-                      className={classes.textFieldTypeInput}
-                      value={mvLine.lotprdcName}
-                      disabled={disable}
-                      InputProps={{}}
-                      onChange={(e) =>
-                        setMvLine({
-                          ...mvLine,
-                          lotprdcName: e.target.value,
-                        })
-                      }
-                      onFocus={() => setMvLine({ ...mvLine, lotprdcName: '' })}
-                      label="Lot Produce"
-                    />
-                  </Grid>
-                  <Grid item xs={6} md={6} sm={6}>
-                    <TextField
-                      id="qty"
-                      className={classes.textFieldTypeInput}
-                      value={mvLine.qty}
-                      disabled={disable}
-                      InputProps={{}}
-                      onChange={(e) =>
-                        setMvLine({ ...mvLine, qty: Number(e.target.value) })
-                      }
-                      onFocus={() => setMvLine({ ...mvLine, qty: '' })}
-                      label="Qty Produce"
-                      type="number"
-                    />
-                    <div>
-                      {mvLine.qtyError && (
-                        <div
-                          style={{
-                            fontSize: '12px',
-                            color: 'rgb(244, 67, 54)',
-                          }}
-                        >
-                          Required
-                        </div>
-                      )}
-                    </div>
-                  </Grid>
-
-                  <Grid item xs={6} md={6} sm={6}>
+                  <Grid item xs={2} md={2} sm={2}>
                     <Button
-                      variant="outlined"
-                      color="secondary"
-                      className={classes.button}
-                      disabled={disable}
-                      onClick={() => addPacking()}
-                    >
-                      Add Produce
-                    </Button>
-                  </Grid>
-                </Grid>
-                <TableContainer component={Paper}>
-                  <Table
-                    className={classes.table}
-                    size="small"
-                    aria-label="a dense table"
-                  >
-                    <TableHead>
-                      <TableRow>
-                        <TableCell align="left">Product</TableCell>
-                        <TableCell align="left">Lot</TableCell>
-                        <TableCell align="right">Qty</TableCell>
-                        <TableCell align="center">Action</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {mvLine.lines.map((row, index) => (
-                        <TableRow key={row.name}>
-                          <TableCell align="left">{row.name}</TableCell>
-                          <TableCell align="left">{row.lot}</TableCell>
-                          <TableCell align="right">{row.productQty}</TableCell>
-                          <TableCell align="center">
-                            <IconButton
-                              className={classes.iconButton}
-                              aria-label="delete"
-                              disabled={disable || loading}
-                              onClick={async () => {
-                                setMsgBox({
-                                  variant: 'success',
-                                  message: '',
-                                });
-                                setLoading(true);
-                                const data = [...mvLine.lines];
-                                let result = false;
-                                result = await odoo.delFinished(
-                                  mvLine.pickingId,
-                                  row.id
-                                );
-
-                                if (result === true) {
-                                  data.splice(index, 1);
-                                  setMvLine({ ...mvLine, lines: data });
-                                } else {
-                                  setMsgBox({
-                                    variant: 'error',
-                                    message: result.message,
-                                  });
-                                }
-                                setLoading(false);
-                              }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                    <TableRow>
-                      {/* <TableCell rowSpan={2} /> */}
-                      <TableCell colSpan={2}>Subtotal Produce</TableCell>
-                      <TableCell align="right">{Total}</TableCell>
-                    </TableRow>
-                  </Table>
-                </TableContainer>
-
-                <Grid container spacing={1}>
-                  <Grid item xs={6} md={6} sm={6}>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      className={classes.button}
+                      className={classes.buttonSaved}
                       disabled={
                         disable ||
-                        mvLine.lines.length === 0 ||
                         mvLine.consume.length === 0 ||
                         TotalConsume < Total
                       }
-                      type="button"
                       onClick={() => handleSubmit()}
                     >
-                      Validate
+                    Saved
                     </Button>
                   </Grid>
-                  <Grid item xs={6} md={6} sm={6}>
+                  <Grid item xs={2} md={2} sm={2}>
                     <Button
-                      className={classes.button}
-                      disabled={disable}
-                      type="button"
-                      variant="outlined"
-                      color="accent"
+                      
+                      color="red"
+                      className={classes.buttonCancel}
+                      disabled={!mvLine.pickingId || printLoading}
                       onClick={() => actCancel()}
                     >
                       Cancel

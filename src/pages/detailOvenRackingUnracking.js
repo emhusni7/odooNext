@@ -180,7 +180,7 @@ const DetailScrapPage = ({
                   select
                 >
                   <MenuItem value="scrap">Scrap</MenuItem>
-                  <MenuItem
+                  {/* <MenuItem
                     value="good"
                     disabled={
                       mode === 'start' &&
@@ -191,7 +191,7 @@ const DetailScrapPage = ({
                   >
                     Good
                   </MenuItem>
-                  <MenuItem value="reject">Reject</MenuItem>
+                  <MenuItem value="reject">Reject</MenuItem> */}
                 </TextField>
 
                 <Grid container spacing={1}>

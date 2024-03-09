@@ -254,7 +254,7 @@ const PotBillet = ({ row, act, idx }) => {
                 onClick={Hitung}
                 variant="contained"
                 disabled={load}
-                color="primary"
+                color="secondary"
               >
                 {load && <CircularProgress size={14} />}
                 {!load && 'Hitung'}
@@ -302,7 +302,7 @@ const PotBillet = ({ row, act, idx }) => {
                 onClick={MoveQty}
                 variant="contained"
                 disabled={load}
-                color="primary"
+                color="secondary"
               >
                 {load && <CircularProgress size={14} />}
                 {!load && 'Copy'}
@@ -331,7 +331,7 @@ const PotBillet = ({ row, act, idx }) => {
                 onClick={handleSave}
                 disabled={moves.disabled || load}
                 variant="outlined"
-                color="primary"
+                color="secondary"
               >
                 {load && <CircularProgress size={14} />}
                 {!load && 'Process'}

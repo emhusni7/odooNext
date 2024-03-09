@@ -24,7 +24,7 @@ import OdooLib from '../models/odoo';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: '#722076',
+    backgroundColor: '#2986cc',
     color: theme.palette.common.white,
   },
   body: {
@@ -91,7 +91,7 @@ const ListQcPage = ({ setTitle, setMsgBox, setLoading }) => {
   const [status, setStatus] = React.useState('new');
 
   React.useEffect(() => {
-    if (!localStorage.getItem('shiftId')) {
+    if (!localStorage.getItem('shiftId') || !localStorage.getItem('wcType')) {
       route.push({
         pathname: '/machine',
         query: { type: 'listQc' },
@@ -99,7 +99,7 @@ const ListQcPage = ({ setTitle, setMsgBox, setLoading }) => {
     } else {
       (async () => {
         setLoading(true);
-        const result = await odoo.getQcExport('');
+        const result = await odoo.getQcExport('', localStorage.getItem('wcType'));
         const res = result.map((x) => ({
           ...x,
           qty: x.outstanding_qty,
@@ -136,7 +136,7 @@ const ListQcPage = ({ setTitle, setMsgBox, setLoading }) => {
 
   const qcFilter = async () => {
     setLoading(true);
-    const result = await odoo.getQcExport(name);
+    const result = await odoo.getQcExport(name, localStorage.getItem('wcType'));
     const res = result.map((x) => ({
       ...x,
       qty: x.outstanding_qty,
@@ -343,6 +343,17 @@ const ListQcPage = ({ setTitle, setMsgBox, setLoading }) => {
             ) : (
               ''
             )}
+            <Button variant="contained"  onClick={(e) => {
+              e.preventDefault()
+              localStorage.removeItem('shiftId')
+              localStorage.removeItem('wcType')
+              route.push({
+                pathname: '/machine',
+                query: { type: 'listQc' },
+              })
+            }}>
+                Ubah QC Tipe
+              </Button>
           </Paper>
         </Grid>
       </Grid>

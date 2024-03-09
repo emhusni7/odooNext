@@ -219,7 +219,7 @@ const PDTransfer = ({ submit, msg }) => {
             >
               <Button
                 variant="outlined"
-                color="primary"
+                color="secondary"
                 className={classes.button}
                 onClick={(e) => formSubmit(e)}
               >

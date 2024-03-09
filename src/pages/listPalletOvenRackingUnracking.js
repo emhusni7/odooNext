@@ -23,7 +23,7 @@ import OdooLib from '../models/odoo';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: '#0b4be0',
+    backgroundColor: '#2986cc',
     color: theme.palette.common.white,
   },
   body: {
@@ -95,6 +95,7 @@ const ListPalletOvenRackingUnrackingPage = ({
     minDate: OdooLib.MinDateTime(new Date().toISOString()),
     maxDate: OdooLib.CurrentTime(new Date().toISOString()),
     dateNow: new Date().toISOString(),
+    
   });
 
   useEffect(() => {
@@ -373,6 +374,7 @@ const ListPalletOvenRackingUnrackingPage = ({
             'preChromate',
             'painting',
             'racking',
+            'treatment',
           ].includes(type)
         }
         value={qty}
@@ -551,6 +553,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                       'unracking',
                       'preChromate',
                       'racking',
+                      'treatment',
                     ].includes(type) &&
                     !disabled) ? (
                     <StyledTableCell align="center">Action</StyledTableCell>
@@ -579,6 +582,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                           'painting',
                           'racking',
                           'unracking',
+                          'treatment',
                         ].includes(type) &&
                         !disabled ? (
                           <StyledTableCell align="center">
@@ -597,7 +601,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                         ) : mode === 'end' &&
                           row.type !== 'good' &&
                           // eslint-disable-next-line prettier/prettier
-                          ['unracking', 'anodize', 'painting', 'racking']
+                          ['unracking', 'anodize', 'painting', 'racking', 'treatment']
                             // eslint-disable-next-line prettier/prettier
                             .includes(type) ? (
                           <StyledTableCell align="center" />
@@ -687,6 +691,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                             'unracking',
                             'racking',
                             'preChromate',
+                            'treatment',
                           ].includes(type) &&
                           !disabled &&
                           row.type === 'good') ? (
@@ -721,6 +726,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                                 'anodize',
                                 'painting',
                                 'racking',
+                                'treatment',
                               ].includes(
                                 // eslint-disable-next-line prettier/prettier
                                 type
@@ -735,6 +741,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                                   'anodize',
                                   'painting',
                                   'racking',
+                                  'treatment',
                                 ].includes(
                                   // eslint-disable-next-line prettier/prettier
                                   type

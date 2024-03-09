@@ -17,6 +17,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import TableRow from '@material-ui/core/TableRow';
 import Router from 'next/router';
 import OdooLib from '../models/odoo';
@@ -137,6 +138,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
     qty: 0,
     qtyTotal: 0,
     pickingId: false,
+    dateTransfer: OdooLib.CurrentTime(new Date()),
     typeError: '',
     productError: '',
     lotError: '',
@@ -154,6 +156,19 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
     options: [],
     isLoading: false,
   });
+
+  const [date, setDate] = React.useState({
+    minDate: OdooLib.MinDateTime(new Date().toISOString()),
+    maxDate: OdooLib.CurrentTime(new Date().toISOString()),
+  });
+
+  React.useEffect(() => {
+    const getDate = async () => {
+      const newDate = await odoo.getDateTolerance(new Date().toISOString());
+      setDate({ ...date, minDate: newDate });
+    };
+    getDate();
+  }, [date.minDate]);
 
   const handleLoadOptions = async () => {
     const res = await odoo.getQuant('', mvLine.locId, mvLine.productId);
@@ -173,6 +188,18 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
     }
   };
 
+  
+
+  const packData = [{value: 'inter', title: 'INTERLIVE PLASTIK / KERTAS'},
+  {value: 'msn', title: 'MESIN SELONGSONG PLASTIK'},
+  {value: 'bdl', title: 'BANDELING'},
+  {value: 'box', title: 'BOX'},
+  {value: 'pt', title: 'PETIAN'},
+  {value: 'pk', title: 'PROTEK'},
+  {value: 'gl', title: 'GLANGSING'},
+  {value: 'shring', title: 'PLASTIK SHRING'}
+]
+
   const getFinished = async (pickId) => {
     setLoading(true);
     const result = await odoo.getFinished(pickId);
@@ -187,6 +214,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
       ...mvLine,
       typeId: pickType.id,
       typeName: pickType.name,
+      dateTransfer: OdooLib.formatDateTime(result.dateTransfer),
       locId: pickType.default_location_src_id[0],
       locDestId: pickType.default_location_dest_id[0],
       locProdId: pickType.default_location_prod_id[0],
@@ -200,6 +228,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
           name: x.name,
           id: x.id,
           lot: x.restrict_lot_id[1],
+          typeBundle: packData.find((y) => y.value === x.type_bundle).title
         };
       }),
       consume: result.consume.map((x) => {
@@ -253,7 +282,8 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
         // eslint-disable-next-line no-use-before-define
         Total,
         mvLine.reportId,
-        localStorage.getItem('odoo_print')
+        localStorage.getItem('odoo_print'),
+        OdooLib.OdooDateTime(mvLine.dateTransfer),
       );
       if (!res.faultCode) {
         setTitle(res.name);
@@ -293,7 +323,8 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
         mvLine.locDestId,
         mvLine.locProdId,
         mvLine.lotId,
-        mvLine.uomId
+        mvLine.uomId,
+        OdooLib.OdooDateTime(mvLine.dateTransfer)
       );
       if (!vals.faultCode) {
         if (!localStorage.getItem('pickingId')) {
@@ -340,12 +371,19 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
       setMvLine({ ...mvLine, qtyError: 'required Field' });
       // eslint-disable-next-line no-use-before-define
     } else if (TotalConsume < Total + mvLine.qty * mvLine.qtyMultiply) {
-      await setTimeout(setLoading(false), 1000);
-      setMsgBox({
-        variant: 'error',
-        message: 'Qty Over ',
-      });
-    } else {
+        await setTimeout(setLoading(false), 1000);
+        setMsgBox({
+          variant: 'error',
+          message: 'Qty Over ',
+        });
+      }
+      else if (!mvLine.typeBundle){
+        setMsgBox({
+          variant: 'error',
+          message: 'Packing Harus Di Isi ',
+        });
+    }
+     else {
       setLoading(true);
       const vals = await odoo.addPackingProduce(
         mvLine.pickingId,
@@ -358,17 +396,20 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
         mvLine.locProdId,
         mvLine.lotId,
         mvLine.uomId,
-        mvLine.qtyMultiply
+        mvLine.qtyMultiply,
+        mvLine.typeBundle.value
       );
       if (!vals.faultCode) {
         if (!localStorage.getItem('pickingId')) {
           localStorage.setItem('pickingId', vals.pickingId);
         }
 
+        const newLines = vals.lines.map((x) => { return {...x, typeBundle: packData.find((y) => y.value === x.typeBundle).title}})
+
         setMvLine({
           ...mvLine,
           pickingId: vals.pickingId,
-          lines: [...mvLine.lines, ...vals.lines],
+          lines: [...mvLine.lines, ...newLines],
         });
         setLoading(false);
         setMsgBox({ variant: 'success', message: 'Data has been add' });
@@ -410,7 +451,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                   <Button
                     className={classes.button}
                     variant="outlined"
-                    color="primary"
+                    color="secondary"
                     type="button"
                     onClick={() => Router.reload()}
                   >
@@ -424,7 +465,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
           </Typography>
           <Paper className={classes.paperType}>
             <Grid container spacing={1}>
-              <Grid item xs={4} md={4} sm={12}>
+              <Grid item xs={6} md={6} sm={12}>
                 {localStorage.getItem('pickingId') ? (
                   <TextField
                     id="typeIdTest"
@@ -475,7 +516,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                   )}
                 </div>
               </Grid>
-              <Grid item xs={4} md={4} sm={12}>
+              <Grid item xs={6} md={6} sm={12}>
                 <AsyncSelect
                   id="productName"
                   name="productName"
@@ -521,7 +562,39 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                   )}
                 </div>
               </Grid>
-              <Grid item xs={4} md={4} sm={12}>
+              
+              <Grid item xs={6} md={6} sm={12}>
+              <TextField
+                  id="dateTransfer"
+                  placeholder='Date Transfer'
+                  type="datetime-local"
+                  defaultValue={mvLine.dateTransfer}
+                  value={mvLine.dateTransfer}
+                  onChange={(e) => {
+                    setMvLine({ ...mvLine, dateTransfer: e.target.value });
+                  }}
+                  className={classes.textField}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  InputProps={{
+                    // readOnly: mvLine.status === 'Done',
+                    inputProps: {
+                      min: date.minDate,
+                      max: date.maxDate,
+                    },
+                  }}
+                /><div>
+                {mvLine.dateError && (
+                  <div
+                    style={{ fontSize: '12px', color: 'rgb(244, 67, 54)' }}
+                  >
+                    Required
+                  </div>
+                )}
+              </div>
+              </Grid>
+              <Grid item xs={6} md={6} sm={12}>
                 <AsyncSelect
                   id="report"
                   name="report"
@@ -551,6 +624,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                   )}
                 </div>
               </Grid>
+
             </Grid>
             <Grid container spacing={1}>
               <Grid item xs={4} md={4} sm={12}>
@@ -766,6 +840,20 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                       Add Produce
                     </Button>
                   </Grid>
+                  <Grid item xs={6} md={6} sm={6}>
+                  <Autocomplete
+                    options={packData}
+                    onChange={(event, value) => {
+                      setMvLine({...mvLine,
+                        typeBundle: value
+                      })
+                    }}
+                    id="typeBundle"
+                    name="typeBundle"
+                    getOptionLabel={(val) => val.title }
+                    renderInput={(params) => <TextField {...params} required={true} error={!!mvLine.typeBundleError} label="Jenis Packing" margin="normal" />}
+                />
+                  </Grid>
                 </Grid>
                 <TableContainer component={Paper}>
                   <Table
@@ -776,6 +864,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                     <TableHead>
                       <TableRow>
                         <TableCell align="left">Lot</TableCell>
+                        <TableCell align="center">Jenis Packing</TableCell>
                         <TableCell align="right">Qty</TableCell>
                         <TableCell align="center">Action</TableCell>
                       </TableRow>
@@ -784,7 +873,9 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                       {mvLine.lines.map((row, index) => (
                         <TableRow key={row.name}>
                           <TableCell align="left">{row.lot}</TableCell>
+                          <TableCell align="center">{row.typeBundle}</TableCell>
                           <TableCell align="right">{row.productQty}</TableCell>
+                         
                           <TableCell align="center">
                             <IconButton
                               className={classes.iconButton}
@@ -825,7 +916,7 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                     </TableBody>
                     <TableRow>
                       {/* <TableCell rowSpan={2} /> */}
-                      <TableCell colSpan={1}>Subtotal Produce</TableCell>
+                      <TableCell colSpan={2}>Subtotal Produce</TableCell>
                       <TableCell align="right">{Total}</TableCell>
                     </TableRow>
                   </Table>

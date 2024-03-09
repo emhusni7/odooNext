@@ -151,7 +151,7 @@ const LossDialog = ({ row, act, idx }) => {
           <Button onClick={handleClose} variant="outlined" color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleSave} variant="outlined" color="primary">
+          <Button onClick={handleSave} variant="outlined" color="secondary">
             Process
           </Button>
         </DialogActions>

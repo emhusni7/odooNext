@@ -193,7 +193,7 @@ const PrintSo = ({ setTitle, setMsgBox, setLoading }) => {
             <Button
               onClick={() => printPreview()}
               variant="contained"
-              color="primary"
+              color="secondary"
               className={classes.button}
             >
               Print

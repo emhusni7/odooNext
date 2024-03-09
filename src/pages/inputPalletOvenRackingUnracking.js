@@ -20,7 +20,7 @@ import BottomNavbarOvenRackingUnrackingSection from '../containers/Layout/bottom
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: '#722076',
+    backgroundColor: '#2986cc',
     color: theme.palette.common.white,
   },
   body: {

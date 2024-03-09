@@ -260,7 +260,7 @@ const InvReport = ({ setTitle, setMsgBox, setLoading }) => {
               <Button
                 onClick={() => printPreview()}
                 variant="contained"
-                color="primary"
+                color="secondary"
                 //   disabled={disabled}
               >
                 Print

@@ -41,7 +41,7 @@ const FullScreenDialog = ({ record, idx, addScrap, msg, enabled }) => {
 
   return (
     <div>
-      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+      <Button variant="contained" color="secondary" onClick={handleClickOpen}>
         Reject/Scrap
       </Button>
       <Dialog
@@ -61,7 +61,7 @@ const FullScreenDialog = ({ record, idx, addScrap, msg, enabled }) => {
               <CloseIcon />
             </IconButton>
             <Typography variant="h6" className={classes.title}>
-              Scrap
+              Scrap / Mutasi / Reproses
             </Typography>
           </Toolbar>
         </AppBar>

@@ -484,7 +484,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
       : false,
       consume: arrCons,
     };
-    console.log(newWo)
+   
     setPress({
       ...press,
       ...newWo,
@@ -761,8 +761,8 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                 <Tabs
                   value={value}
                   onChange={handleChange}
-                  indicatorColor="primary"
-                  textColor="primary"
+                  indicatorcolor="secondary"
+                 
                   variant="scrollable"
                   scrollButtons="auto"
                   aria-label="scrollable auto tabs example"
@@ -787,6 +787,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                         <StyledTableCell align="center">
                           Product
                         </StyledTableCell>
+                       
                         <StyledTableCell align="center">
                           Location
                         </StyledTableCell>
@@ -1072,7 +1073,7 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                   <Grid container spacing={3} justify="flex-end">
                     <Button
                       variant="contained"
-                      color="primary"
+                      color="secondary"
                       className={classes.buttonSaveTab}
                       onClick={() => {
                         addBillet();
@@ -1318,6 +1319,9 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                         <StyledTableCell align="center">
                           Product
                         </StyledTableCell>
+                        <StyledTableCell align="center">
+                          Note
+                        </StyledTableCell>
                         <StyledTableCell align="center">Type</StyledTableCell>
                         <StyledTableCell align="center">Qty</StyledTableCell>
                         <StyledTableCell align="center">UoM</StyledTableCell>
@@ -1329,6 +1333,9 @@ const PressPage = ({ setTitle, setMsgBox, setLoading }) => {
                             <StyledTableRow key={row.product}>
                               <StyledTableCell align="left">
                                 {row.product}
+                              </StyledTableCell>
+                              <StyledTableCell align="left">
+                                {row.note}
                               </StyledTableCell>
                               <StyledTableCell align="center">
                                 {row.note === 'Roll' ? (

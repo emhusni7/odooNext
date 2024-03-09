@@ -742,7 +742,7 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
                 <Button
                   variant="outlined"
                   style={{ backgroundColor: 'blue', marginTop: '10px', marginLeft: '15px' }}
-                  color="primary"
+                  color="secondary"
                   disabled={!picking.lot_id || disabled}
                   onClick={() => addItem()}
                 >
@@ -767,7 +767,7 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
           <Grid item xs={4} md={4} sm={4}>
             <Button
               variant="contained"
-              color="primary"
+              color="secondary"
               type="button"
               style={{ backgroundColor: 'green', marginTop: '10px', marginLeft: '15px' }}
               disabled={disabled || picking.moves.length === 0}
@@ -782,7 +782,7 @@ const MeltingTransferPage = ({ setTitle, setMsgBox, setLoading }) => {
               type="button"
               style={{ backgroundColor: 'white', marginTop: '10px', marginLeft: '15px', color: 'black' }}
               variant="outlined"
-              color="primary"
+              color="secondary"
               onClick={() => actReload()}
             >
               Reload

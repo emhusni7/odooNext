@@ -105,7 +105,7 @@ const OrderItem = ({ loading, Msg, setOrderLine }) => {
 
   return (
     <div>
-      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+      <Button variant="outlined" color="secondary" onClick={handleClickOpen}>
         Add Item
       </Button>
       <Dialog
@@ -200,7 +200,7 @@ const OrderItem = ({ loading, Msg, setOrderLine }) => {
                     marginTop: 20,
                   }}
                   variant="contained"
-                  color="primary"
+                  color="secondary"
                   onClick={() => handleSubmit(item)}
                 >
                   Add Item
@@ -393,7 +393,7 @@ const OrderDetail = ({ setLoading, setMsgBox, onClick, delSo }) => {
             <TableCell colSpan={4}>
               <Button
                 variant="contained"
-                color="primary"
+                color="secondary"
                 onClick={() => onClick('create')}
               >
                 Create Quotations

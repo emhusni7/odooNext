@@ -567,7 +567,7 @@ const EnhancedTable = ({ setTitle, setLoading, setMsgBox }) => {
         />
       </Paper>
       {!status.state ? (
-        <Button variant="contained" color="primary" onClick={() => process()}>
+        <Button variant="contained" color="secondary" onClick={() => process()}>
           Get Nitrid
         </Button>
       ) : (
@@ -576,7 +576,7 @@ const EnhancedTable = ({ setTitle, setLoading, setMsgBox }) => {
       {status.state === 'draft' ? (
         <Button
           variant="contained"
-          color="primary"
+          color="secondary"
           onClick={() => startWorking()}
         >
           Start Nitrid
@@ -590,7 +590,7 @@ const EnhancedTable = ({ setTitle, setLoading, setMsgBox }) => {
         <Button
           style={{ margin: 5 }}
           variant="outlined"
-          color="primary"
+          color="secondary"
           onClick={() => getNitrid('')}
         >
           Lookup Die
@@ -599,7 +599,7 @@ const EnhancedTable = ({ setTitle, setLoading, setMsgBox }) => {
         ''
       )}
       {status.state === 'startworking' ? (
-        <Button variant="contained" color="primary" onClick={() => setDone()}>
+        <Button variant="contained" color="secondary" onClick={() => setDone()}>
           Finished Nitrid
         </Button>
       ) : (
@@ -623,7 +623,7 @@ const EnhancedTable = ({ setTitle, setLoading, setMsgBox }) => {
       {status.state === 'done' ? (
         <Button
           variant="outlined"
-          color="primary"
+          color="secondary"
           onClick={() => Router.reload()}
         >
           Reload

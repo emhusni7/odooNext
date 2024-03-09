@@ -27,7 +27,7 @@ import OdooLib from '../models/odoo';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: '#722076',
+    backgroundColor: '#2986cc',
     color: theme.palette.common.white,
   },
   body: {
@@ -76,6 +76,7 @@ function a11yProps(index) {
 const useStyles = makeStyles({
   table: {
     minWidth: 100,
+    backgroundColor: '#CF4500',
   },
   root: {
     flexGrow: 1,
@@ -178,6 +179,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
     }
     return localStorage.getItem('chromateMchName');
   };
+
   const [etching, setEtching] = React.useState({
     id: '',
     shiftId,
@@ -189,6 +191,9 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
     weight_act: 0,
     under_weight: 0,
     recovery: 0,
+    downtime_start: false,
+    downtime_end: false,
+    reason: '',
     total_length: 0,
     kg: 0,
     kg_hour: 0,
@@ -231,9 +236,16 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
         message: 'Problem Corrective filled but not Clik Button',
       });
     } else {
-      const produce = await odoo.endEtching({...etching,  
+      const produce = await odoo.endEtching({
+        ...etching,  
         dateStart: etching.dateStart !== '' ? OdooLib.OdooDateTime(etching.dateStart): '',
-        dateEnd: etching.dateEnd !== '' ? OdooLib.OdooDateTime(etching.dateEnd): ''});
+        dateEnd: etching.dateEnd !== '' ? OdooLib.OdooDateTime(etching.dateEnd): '',
+        downtime_start: etching.downtime_start !== false ? OdooLib.OdooDateTime(etching.downtime_start): '',
+        downtime_end: etching.downtime_end !== false ? OdooLib.OdooDateTime(etching.downtime_end): '',
+        downtime_reason: etching.downtime_reason
+      })
+        
+        
       if (!produce.faultCode) {
         setEtching({
           ...etching,
@@ -252,12 +264,15 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
   const saveProduce = async () => {
     setLoading(true);
     setMsgBox({ variant: 'success', message: '' });
-    console.log(etching.dateEnd)
+   
     const produce = await odoo.saveProduceEtc(
       etching.outputId,
       etching.produce,
       etching.dateStart !== '' ? OdooLib.OdooDateTime(etching.dateStart): '',
-      etching.dateEnd !== '' ? OdooLib.OdooDateTime(etching.dateEnd) : ''
+      etching.dateEnd !== '' ? OdooLib.OdooDateTime(etching.dateEnd) : '',
+      etching.downtime_start !== '' ? OdooLib.OdooDateTime(etching.downtime_start): '',
+      etching.downtime_end !== '' ? OdooLib.OdooDateTime(etching.downtime_end) : '',
+      etching.downtime_reason
     );
     if (!produce.faultCode) {
       setLoading(false);
@@ -328,6 +343,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
 
   const getWo = async () => {
     const woOrder = await odoo.getWorkOrder(woId);
+    console.log(woOrder);
     setEtching((prev) => ({
       ...prev,
       ...woOrder,
@@ -337,6 +353,14 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
         dateEnd: woOrder.dateEnd !== ''
         ? OdooLib.formatDateTime(woOrder.dateEnd)
         : '',
+        downtime_start: woOrder.downtime_start !== ''
+        ? OdooLib.formatDateTime(woOrder.downtime_start)
+        : '',
+        downtime_end: woOrder.downtime_end !== ''
+        ? OdooLib.formatDateTime(woOrder.downtime_end)
+        : '',
+
+
       }));
   };
 
@@ -557,8 +581,8 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                 <Tabs
                   value={value}
                   onChange={handleChange}
-                  indicatorColor="primary"
-                  textColor="primary"
+                  indicatorcolor="secondary"
+                  textcolor="secondary"
                   variant="scrollable"
                   scrollButtons="auto"
                   aria-label="scrollable auto tabs example"
@@ -662,7 +686,8 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                     </TableBody>
                   </Table>
                 </TableContainer>
-                {etching.status === 'In Progress' ? (
+                
+                {etching.status === 'In Progress' ? (<>
                   <Grid container spacing={3} justify="flex-end">
                     <Button
                       variant="outlined"
@@ -676,9 +701,81 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                       Save Consume
                     </Button>
                   </Grid>
+                  <Grid container spacing={3}>
+                  <Grid item xs={3} sm={3}>
+                      <Paper className={classes.paper} elevation={0}>
+                      <TextField
+                          id="DtStart"
+                          label="Downtime Start"
+                          type="datetime-local"
+                          value={etching.downtime_start ? etching.downtime_start : false}
+                          onChange={(e) => {
+                            setEtching({ ...etching, downtime_start: e.target.value });
+                          }}
+                          className={classes.textField}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          InputProps={{
+                            readOnly: etching.status === 'Done',
+                            inputProps: {
+                              min: date.minDate,
+                              max: date.maxDate,
+                            },
+                          }}
+                        />
+                      </Paper>
+                    </Grid>
+                    <Grid item xs={3} sm={3}>
+                      <Paper className={classes.paper} elevation={0}>
+                      <TextField
+                          id="dtEnd"
+                          label="Downtime End"
+                          type="datetime-local"
+                          value={etching.downtime_end ? etching.downtime_end : false}
+                          onChange={(e) => {
+                            setEtching({ ...etching, downtime_end: e.target.value });
+                          }}
+                          className={classes.textField}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          InputProps={{
+                            readOnly: etching.status === 'Done',
+                            inputProps: {
+                              min: date.minDate,
+                              max: date.maxDate,
+                            },
+                          }}
+                        />
+                      </Paper>
+                    </Grid>
+                    <Grid item xs={3} sm={3}>
+                    <Paper className={classes.paper} elevation={0}>
+                      <TextField
+                        variant="outlined"
+                        id="reason"
+                        name="reason"
+                        disabled={etching.status === 'Done'}
+                        label="Reason"
+                        className={classes.textField}
+                        value={etching.downtime_reason}
+                        InputLabelProps={{ shrink: true }}
+                        onChange={(e) =>
+                          setEtching({
+                            ...etching,
+                            downtime_reason: e.target.value,
+                          })
+                        }
+                      
+                      />
+                    </Paper>
+                  </Grid>
+                  </Grid></>
                 ) : (
                   ''
                 )}
+                
               </TabPanel>
               <TabPanel value={value} index={1}>
                 <TableContainer component={Paper}>

@@ -385,7 +385,7 @@ const EnhancedTable = ({ setTitle, setLoading, setMsgBox }) => {
                 <Button
                   onClick={() => getInvLot()}
                   variant="contained"
-                  color="primary"
+                  color="secondary"
                   //   disabled={disabled}
                 >
                   Process

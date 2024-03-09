@@ -109,7 +109,7 @@ const CalcDialog = ({ row, act, idx, setLoading }) => {
             onClick={handleSave}
             disabled={moves.disabled}
             variant="outlined"
-            color="primary"
+            color="secondary"
           >
             Process
           </Button>

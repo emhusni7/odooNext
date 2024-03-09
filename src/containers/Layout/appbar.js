@@ -187,6 +187,7 @@ const AppbarSection = ({ title, setMsgBox }) => {
     localStorage.removeItem('rollMchId');
     localStorage.removeItem('spvId');
     localStorage.removeItem('spvName');
+    localStorage.removeItem('wcType');
     Router.push('/login');
   };
 

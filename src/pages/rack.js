@@ -18,7 +18,7 @@ import OdooLib from '../models/odoo';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: '#722076',
+    backgroundColor: '#2986cc',
     color: theme.palette.common.white,
   },
   body: {
@@ -182,7 +182,7 @@ const RackPage = ({ setTitle, setMsgBox, setLoading }) => {
                           }}
                           disabled={disable}
                           value={xy.checked}
-                          color="primary"
+                          color="secondary"
                           inputProps={{ 'aria-label': 'Check' }}
                         />
                       </StyledTableCell>

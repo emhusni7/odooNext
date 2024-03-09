@@ -700,8 +700,8 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
                 <Tabs
                   value={value}
                   onChange={handleChange}
-                  indicatorColor="primary"
-                  textColor="primary"
+                  indicatorcolor="secondary"
+                  textcolor="secondary"
                   variant="scrollable"
                   scrollButtons="auto"
                   aria-label="scrollable auto tabs example"
@@ -835,7 +835,7 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
                   <Grid container spacing={3} justify="flex-end">
                     <Button
                       variant="outlined"
-                      color="primary"
+                      color="secondary"
                       className={classes.buttonSaveTab}
                       onClick={() => {
                         addCMelting();
@@ -846,7 +846,7 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
                     </Button>
                     <Button
                       variant="outlined"
-                      color="primary"
+                      color="secondary"
                       className={classes.buttonSaveTab}
                       onClick={() => {
                         getListConsume();
@@ -1119,7 +1119,7 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
                   <Grid container spacing={3} justify="flex-end">
                     <Button
                       variant="outlined"
-                      color="primary"
+                      color="secondary"
                       className={classes.buttonSaveTab}
                       onClick={() => {
                         generateLot();
@@ -1129,7 +1129,7 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
                     </Button>
                     <Button
                       variant="outlined"
-                      color="primary"
+                      color="secondary"
                       className={classes.buttonSaveTab}
                       onClick={() => {
                         addProduce();
@@ -1140,7 +1140,7 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
                     </Button>
                     <Button
                       variant="outlined"
-                      color="primary"
+                      color="secondary"
                       className={classes.buttonSaveTab}
                       disabled={
                         melting.prdSaved &&

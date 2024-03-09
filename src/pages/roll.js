@@ -599,7 +599,7 @@ const EnhancedTable = ({ setTitle, setLoading, setMsgBox }) => {
         />
       </Paper>
       {!status.state && status.page === 'lookup' ? (
-        <Button variant="contained" color="primary" onClick={() => process()}>
+        <Button variant="contained" color="secondary" onClick={() => process()}>
           Start roll
         </Button>
       ) : (
@@ -608,7 +608,7 @@ const EnhancedTable = ({ setTitle, setLoading, setMsgBox }) => {
       {status.state === 'start' && status.page === 'roll' ? (
         <Button
           variant="contained"
-          color="primary"
+          color="secondary"
           onClick={() => setDoneRoll()}
         >
           Set Done

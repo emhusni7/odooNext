@@ -1,5 +1,3 @@
-/* eslint-disable no-empty */
-/* eslint-disable import/no-named-as-default-member */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Fade from '@material-ui/core/Fade';
@@ -13,7 +11,6 @@ import Head from 'next/dist/next-server/lib/head';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { green } from '@material-ui/core/colors';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-// eslint-disable-next-line import/no-named-as-default
 import OdooLib from '../models/odoo';
 import SnackbarMessage from '../components/snackbar';
 
@@ -143,6 +140,7 @@ const MachinePage = ({ setTitle }) => {
     rollMchName: '',
     treatMchId: '',
     treatMchName: '',
+    qcType: '',
     errorMch: '',
     errorShf: '',
     errorSpv: '',
@@ -759,6 +757,8 @@ const MachinePage = ({ setTitle }) => {
         if (type === 'die') {
           localStorage.setItem('dieMchId', state.dieMchId);
           localStorage.setItem('dieMchName', state.dieMchName);
+        } else if(type === 'listQc') {
+          localStorage.setItem('wcType', state.qcType)
         } else if (type === 'searchRack') {
           localStorage.setItem('palletMchId', state.palletMchId);
           localStorage.setItem('palletMchName', state.palletMchName);
@@ -950,6 +950,36 @@ const MachinePage = ({ setTitle }) => {
                   ) : (
                     ''
                   )}
+                 
+                  {
+                    type === 'listQc' ? 
+                      (<Box>
+                        <Autocomplete
+                          id="qc_type"
+                          openOnFocus
+                          options={[
+                            {'title': 'QC Export', 'value': 'packing_exp'},
+                            {'title': 'QC Local', 'value': 'packing'},
+                            {'title': 'QC FI', 'value': 'qcfi'}
+                          ]}
+                          onChange={(event, newVal) => {
+                            if (!!newVal){
+                                setState({
+                                  ...state,
+                                  qcType: newVal.value
+                                })
+                            }
+                          }}
+                          required
+                        
+                          error={!state.qcType}
+                          getOptionLabel={(data) => data.title}
+                          renderInput={(params) => 
+                          <TextField {...params} label="QC Type" margin="normal" />}
+                        />
+                      </Box>) : ''
+                  }
+                
 
                   <Box className={classes.wrapper}>
                     <Button
