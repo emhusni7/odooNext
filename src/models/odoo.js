@@ -1677,7 +1677,7 @@ export default class OdooLib {
     }
   }
 
-  async createQcExport(data) {
+  async createQcExport(data, dateStart, dateEnd) {
     try {
       const result = await this.executeKW(
         'mrp.production.output',
@@ -1687,6 +1687,8 @@ export default class OdooLib {
           localStorage.getItem('shiftId'),
           localStorage.getItem('uid'),
           data,
+          dateStart,
+          dateEnd
         ]
       );
       return result;

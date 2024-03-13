@@ -89,6 +89,22 @@ const ListQcPage = ({ setTitle, setMsgBox, setLoading }) => {
   const [disabled, setDisable] = React.useState(false);
   const [done, setDone] = React.useState(false);
   const [status, setStatus] = React.useState('new');
+  const [date, setDate] = React.useState({
+    minDate: OdooLib.MinDateTime(new Date().toISOString()),
+    maxDate: OdooLib.CurrentTime(new Date().toISOString()),
+    dateStart: OdooLib.CurrentTime(new Date().toISOString()),
+    dateEnd: OdooLib.CurrentTime(new Date().toISOString())
+  });
+
+
+  React.useEffect(() => {
+    const getDate = async () => {
+      const newDate = await odoo.getDateTolerance(new Date().toISOString());
+      setDate({ ...date, minDate: newDate });
+    };
+    getDate();
+  }, [date.minDate]);
+
 
   React.useEffect(() => {
     if (!localStorage.getItem('shiftId') || !localStorage.getItem('wcType')) {
@@ -149,7 +165,7 @@ const ListQcPage = ({ setTitle, setMsgBox, setLoading }) => {
   const validate = async () => {
     setLoading(true);
     setMsgBox({ variant: 'success', message: '' });
-    const res = await odoo.createQcExport(rows);
+    const res = await odoo.createQcExport(rows, OdooLib.OdooDateTime(date.dateStart), OdooLib.OdooDateTime(date.dateEnd));
     if (!res.faultCode) {
       setRow(res);
       setDone(true);
@@ -166,6 +182,59 @@ const ListQcPage = ({ setTitle, setMsgBox, setLoading }) => {
       <Head>
         <title>Odoo Warehouse - List Rack</title>
       </Head>
+      {status !== 'new'? (<Grid container spacing={2}>
+        <Grid item xs={6} md={6} sm={6}>
+                <Paper className={classes.paper} elevation={0}>
+                  <TextField
+                    id="dateStart"
+                    label="Start Date"
+                    type="datetime-local"
+                    value={date.dateStart ? date.dateStart : ''}
+                    onChange={(e) => {
+                      setDate({ ...date, dateStart: e.target.value });
+                    }}
+                    className={classes.textField}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    InputProps={{
+                      readOnly: status === 'done',
+                      inputProps: {
+                        min: date.minDate,
+                        max: date.maxDate,
+                      },
+                    }}
+                  />
+                </Paper>
+          </Grid>
+          <Grid item xs={6} md={6} sm={6}>
+                <Paper className={classes.paper} elevation={0}>
+                  <TextField
+                    id="dateEnd"
+                    label="End Date"
+                    type="datetime-local"
+                    value={date.dateEnd ? date.dateEnd : ''}
+                    onChange={(e) => {
+                      setDate({ ...date, dateEnd: e.target.value });
+                    }}
+                    className={classes.textField}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    InputProps={{
+                      readOnly: status === 'done',
+                      inputProps: {
+                        min: date.minDate,
+                        max: date.maxDate,
+                      },
+                    }}
+                  />
+                </Paper>
+          </Grid>
+          
+          </Grid>) : ''}
+      
+
       {!disabled ? (
         <Box className="row">
           <Paper component="form" className={classes.root}>
