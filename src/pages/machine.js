@@ -959,7 +959,7 @@ const MachinePage = ({ setTitle }) => {
                           openOnFocus
                           options={[
                             {'title': 'QC Export', 'value': 'packing_exp'},
-                            {'title': 'QC Local', 'value': 'packing'},
+                            {'title': 'QC Local / Stock', 'value': 'packing'},
                             {'title': 'QC FI', 'value': 'qcfi'}
                           ]}
                           onChange={(event, newVal) => {
