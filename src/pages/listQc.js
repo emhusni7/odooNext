@@ -12,7 +12,7 @@ import Paper from '@material-ui/core/Paper';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import { useRouter } from 'next/router';
+import router, { useRouter } from 'next/router';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 import InputBase from '@material-ui/core/InputBase';
@@ -405,13 +405,18 @@ const ListQcPage = ({ setTitle, setMsgBox, setLoading }) => {
               <Button variant="outlined" onClick={process}>
                 Process
               </Button>
-            ) : !done ? (
+            ) : !done && rows ? (
               <Button variant="contained" onClick={validate}>
                 Validate
               </Button>
             ) : (
               ''
             )}
+            {
+              !!done ? (<Button variant="outlined" onClick={router.push('/listQc')}>
+              Refresh
+            </Button>): ''
+            }
             <Button variant="contained"  onClick={(e) => {
               e.preventDefault()
               localStorage.removeItem('shiftId')
