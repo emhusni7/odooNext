@@ -27,10 +27,7 @@ const useStyles = makeStyles((theme) => ({
   input: {
     marginLeft: theme.spacing(1),
     flex: 1,
-    '&::placeholder': {
-      textOverflow: 'ellipsis !important',
-      color: 'blue'
-    }
+   
   },
   iconButton: {
     padding: 10,

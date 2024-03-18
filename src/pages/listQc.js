@@ -170,6 +170,7 @@ const ListQcPage = ({ setTitle, setMsgBox, setLoading }) => {
     setLoading(true);
     setMsgBox({ variant: 'success', message: '' });
     const res = await odoo.createQcExport(rows, OdooLib.OdooDateTime(date.dateStart), OdooLib.OdooDateTime(date.dateEnd));
+    console.log(res);
     if (!res.faultCode) {
       setRow(res);
       setDone(true);
@@ -417,7 +418,7 @@ const ListQcPage = ({ setTitle, setMsgBox, setLoading }) => {
               ''
             )}
             {
-              !!done ? (<Button variant="outlined" onClick={router.push('/listQc')}>
+              !!done ? (<Button variant="outlined" onClick={() => router.reload()}>
               Refresh
             </Button>): ''
             }

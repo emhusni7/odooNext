@@ -70,13 +70,9 @@ const theme = createMuiTheme({
         fontWeight: "bold",
         borderColor: "#2e2e2e",
         borderWidth: "2px",
-        "&::placeholder": {
-          color: "#000"
-        },
+       
       },
-      "&::placeholder": {
-        color: "#000"
-      },
+      
     },
     MuiInputBase:{
       root: {
@@ -93,10 +89,7 @@ const theme = createMuiTheme({
         },
        
       },  
-      "&::placeholder": {
-        color: "#000",
-        fontWeight: "bold"
-      },    
+      
     },
     MuiInput: {
         "&::placeholder": {
