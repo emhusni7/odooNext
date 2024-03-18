@@ -86,7 +86,20 @@ const theme = createMuiTheme({
       
       
     },
-    
+    MuiInputLabel:{
+      root: {
+        color: "#000",
+        fontFamily: "Arial",
+        fontWeight: "bold",
+        borderColor: "#2e2e2e",
+        borderWidth: "2px",
+        "&.Mui-disabled": {
+          
+          color: "#000",
+          fontWeight: "bold",
+        }
+      },  
+    }
    
     
     
