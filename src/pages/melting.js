@@ -35,7 +35,7 @@ import OdooLib from '../models/odoo';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: '#722076',
+    backgroundColor: '#0b4be0',
     color: theme.palette.common.white,
   },
   body: {
@@ -176,6 +176,21 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
   });
   setTitle(melting.name || 'Melting Production');
   const loading = open && options.length === 0;
+
+  const [date, setDate] = React.useState({
+    minDate: OdooLib.MinDateTime(new Date().toISOString()),
+    maxDate: OdooLib.CurrentTime(new Date().toISOString()),
+  });
+
+  useEffect(() => {
+    const getDate = async () => {
+      const newDate = await odoo.getDateTolerance(new Date().toISOString());
+      setDate({ ...date, minDate: newDate });
+    };
+    getDate();
+  }, [date.minDate]);
+
+
   React.useEffect(() => {
     let active = true;
     (async () => {
@@ -218,12 +233,13 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
         message: 'Product to Consume must be Saved and Required',
       });
     } else {
+
       const produce = await odoo.endMelting(melting);
       if (!produce.faultCode) {
         setMelting({
           ...melting,
           status: 'Done',
-          dateEnd: produce.date_finished,
+          dateEnd: melting.dateEnd,
         });
         setLoading(false);
         setMsgBox({ variant: 'success', message: 'Transaction Has Been Done' });
@@ -279,13 +295,17 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
       melting.mchID,
       melting.wcId,
       melting.shiftId,
-      melting.note
+      melting.note,
+      OdooLib.OdooDateTime(melting.dateStart)
     );
+   
     setLoading(false);
     if (!moveLines.faultCode) {
       setMelting((prevState) => ({
         ...prevState,
         ...moveLines,
+          dateStart: melting.dateStart
+        
       }));
     } else {
       setMsgBox({ variant: 'error', message: moveLines.message });
@@ -390,7 +410,8 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
   const getWo = async () => {
     setLoading(true);
     const woOrder = await odoo.getWorkOrderMelting(woId);
-    setMelting((prevState) => ({ ...prevState, ...woOrder }));
+    const NewWorder = {...woOrder, dateStart: OdooLib.formatDateTime(woOrder.dateStart), dateEnd: OdooLib.formatDateTime(woOrder.dateEnd)}
+    setMelting((prevState) => ({ ...prevState, ...NewWorder }));
     setLoading(false);
   };
 
@@ -588,27 +609,37 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
                   value={melting.machine}
                   className={classes.textField}
                   InputLabelProps={{ shrink: true }}
-                  disabled
+                  InputProps={{
+                    readOnly: true
+                   
+                  }}
                 />
               </Paper>
             </Grid>
 
             <Grid item xs={6} md={6} sm={6}>
               <Paper className={classes.paper} elevation={0}>
-                <TextField
+              <TextField
                   id="dateStart"
                   label="Start Date"
-                  value={
-                    melting.dateStart
-                      ? OdooLib.formatDateTime(melting.dateStart)
-                      : ''
+                  type="datetime-local"
+                  value={melting.dateStart ? melting.dateStart : ''}
+                  onChange={(e) => 
+                    setMelting({ ...melting, dateStart: e.target.value })
                   }
                   className={classes.textField}
                   InputLabelProps={{
                     shrink: true,
                   }}
-                  disabled
+                  InputProps={{
+                    readOnly: melting.status === 'Done',
+                    inputProps: {
+                      min: date.minDate,
+                      max: date.maxDate,
+                    },
+                  }}
                 />
+               
               </Paper>
             </Grid>
           </Grid>
@@ -622,26 +653,35 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
                   className={classes.textField}
                   value={melting.moname}
                   InputLabelProps={{ shrink: true }}
-                  disabled
+                  InputProps={{
+                    readOnly: true
+                   
+                  }}
                 />
               </Paper>
             </Grid>
 
             <Grid item xs={6} md={6} sm={6}>
               <Paper className={classes.paper} elevation={0}>
-                <TextField
-                  id="dateFinish"
+              <TextField
+                  id="dateEnd"
                   label="End Date"
-                  value={
-                    melting.dateEnd
-                      ? OdooLib.formatDateTime(melting.dateEnd)
-                      : ''
+                  type="datetime-local"
+                  value={melting.dateEnd ? melting.dateEnd : ''}
+                  onChange={(e) => 
+                    setMelting({ ...melting, dateEnd: e.target.value })
                   }
                   className={classes.textField}
                   InputLabelProps={{
                     shrink: true,
                   }}
-                  disabled
+                  InputProps={{
+                    readOnly: melting.status === 'Done',
+                    inputProps: {
+                      min: date.minDate,
+                      max: date.maxDate,
+                    },
+                  }}
                 />
               </Paper>
             </Grid>
@@ -655,7 +695,11 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
                   InputLabelProps={{
                     shrink: true,
                   }}
-                  disabled
+                  InputProps={{
+                    readOnly: true
+                   
+                  }}
+               a
                 />
               </Paper>
             </Grid>
@@ -700,7 +744,7 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
                 <Tabs
                   value={value}
                   onChange={handleChange}
-                  indicatorcolor="secondary"
+                  // indicatorcolor="secondary"
                   textcolor="secondary"
                   variant="scrollable"
                   scrollButtons="auto"

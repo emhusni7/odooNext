@@ -46,6 +46,7 @@ const theme = createMuiTheme({
           'no-tabs': 0,
         },
       },
+      
       // text: {
       //   // background: '#29b3af', // 'linear-gradient(45deg, #29b3af 30%, #7c476d 90%)',
       //   // borderRadius: 30,
@@ -60,6 +61,36 @@ const theme = createMuiTheme({
       //   },
       // },
     },
+    MuiInputLabel: {
+      root: {
+        color: "#000",
+        fontFamily: "Arial",
+        fontWeight: "bold",
+        borderColor: "#2e2e2e",
+        borderWidth: "2px",
+      },
+    },
+    MuiInputBase:{
+      root: {
+        color: "#000",
+        fontFamily: "Arial",
+        fontWeight: "bold",
+        borderColor: "#2e2e2e",
+        borderWidth: "2px",
+        "&.Mui-disabled": {
+          background: "#eaeaea",
+          color: "#000",
+          fontWeight: "bold",
+        }
+      },
+      
+      
+    },
+    
+   
+    
+    
+
   },
 });
 

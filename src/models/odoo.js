@@ -851,6 +851,7 @@ export default class OdooLib {
           press.note,
           Number(localStorage.getItem('shiftId')),
           press.produce,
+          OdooDateTime(press.dateEnd),
         ]
       );
       return result;
@@ -859,12 +860,12 @@ export default class OdooLib {
     }
   }
 
-  async startMelting(woId, mchID, wcId, shiftId, note) {
+  async startMelting(woId, mchID, wcId, shiftId, note, dateStart) {
     try {
       const result = await this.executeKW(
         'mrp.production.output',
         'startMelting',
-        [false, woId, mchID, wcId, shiftId, note]
+        [false, woId, mchID, wcId, shiftId, note, dateStart]
       );
       return result;
     } catch (e) {
