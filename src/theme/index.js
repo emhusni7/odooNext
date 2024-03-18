@@ -25,6 +25,12 @@ const theme = createMuiTheme({
       disabled: '#ffffff'
     }
   },
+  typography: { 
+    h6: {
+      fontWeight: 600,
+    },
+  },
+  
   overrides: {
     MuiButton: {
       contained: {
@@ -73,6 +79,18 @@ const theme = createMuiTheme({
        
       },
       
+    },
+    MuiTableHead:{
+      root: {
+        fontWeight:"bold",
+      },
+    
+    },
+    MuiTableCell: {
+      root: {
+        fontWeight: "bold",
+        fontSize:18,
+      }
     },
     MuiInputBase:{
       root: {

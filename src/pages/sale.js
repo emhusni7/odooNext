@@ -132,7 +132,7 @@ const OrderItem = ({ loading, Msg, setOrderLine }) => {
         <div style={{ marginTop: 30, paddingTop: 50 }}>
           <>
             <form name="contactform">
-              <Typography>Please type your work in the below :</Typography>
+              <Typography variant='h6'>Please type your work in the below :</Typography>
               <Paper>
                 <Grid container spacing={1}>
                   <Grid item xs={12} md={12} sm={12}>

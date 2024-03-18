@@ -28,10 +28,14 @@ const useStyles = makeStyles({
   table: {
     minWidth: 750,
   },
+  ".MuiTableCell-head": {
+    fontWeight: "bold"
+  },
   root: {
     flexGrow: 1,
     marginLeft: '10px',
     marginRight: '10px',
+    
   },
   formControl: {
     minWidth: '100%',
@@ -106,11 +110,7 @@ const useStyles = makeStyles({
     marginTop: 5,
     textAlign: 'center',
     height: '100%',
-  },
-  labelStyle: {
-    fontSize: ['0.5rem', '1.5rem'],
-    color: 'blue',
-  },
+  }
 });
 
 const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
@@ -271,7 +271,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
               ''
             )}
           </Grid>
-          <Typography>
+          <Typography variant='h6'>
             <Box fontStyle="italic" fontWeight="fontWeightMedium" m={1}>
               Information :
             </Box>
@@ -279,7 +279,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
           <Paper className={classes.paper} elevation={2}>
             <Grid container spacing={2}>
               <Grid item xs={2} className={classes.labelDesign}>
-                <Typography>MO</Typography>
+                <Typography variant='h6'>MO</Typography>
               </Grid>
               <Grid item xs={3} sm container>
                 <Grid item xs container direction="column" spacing={2}>
@@ -301,8 +301,8 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
             </Grid>
 
             <Grid container spacing={2}>
-              <Grid item xs={2} className={classes.labelDesign}>
-                <Typography>Start Date</Typography>
+              <Grid item xs={2} >
+                <Typography variant='h6'>Start Date</Typography>
               </Grid>
               <Grid item xs={3} sm container>
                 <Grid item xs container direction="column" spacing={2}>
@@ -324,7 +324,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
               </Grid>
 
               <Grid item xs={2} className={classes.labelDesign}>
-                <Typography>End Date</Typography>
+                <Typography variant='h6'>End Date</Typography>
               </Grid>
               <Grid item xs={3} sm container>
                 <Grid item xs container direction="column" spacing={2}>
@@ -348,7 +348,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
 
             <Grid container spacing={2}>
               <Grid item xs={2} className={classes.labelDesign}>
-                <Typography>Die</Typography>
+                <Typography variant='h6'>Die</Typography>
               </Grid>
               <Grid item xs={3} sm container>
                 <Grid item xs container direction="column" spacing={2}>
@@ -363,7 +363,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                 </Grid>
               </Grid>
               <Grid item xs={2} className={classes.labelDesign}>
-                <Typography>Hole</Typography>
+                <Typography variant='h6'>Hole</Typography>
               </Grid>
               <Grid item xs={3} sm container>
                 <Grid item xs container direction="column" spacing={2}>
@@ -385,7 +385,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
               <>
                 <Grid container spacing={2}>
                   <Grid item xs={2} className={classes.labelDesign}>
-                    <Typography>Times Nitriding</Typography>
+                    <Typography variant='h6'>Times Nitriding</Typography>
                   </Grid>
                   <Grid item xs={3} sm container>
                     <Grid item xs container direction="column" spacing={2}>
@@ -400,7 +400,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                     </Grid>
                   </Grid>
                   <Grid item xs={2} className={classes.labelDesign}>
-                    <Typography>Weight Act</Typography>
+                    <Typography variant='h6'>Weight Act</Typography>
                   </Grid>
                   <Grid item xs={3} sm container>
                     <Grid item xs container direction="column" spacing={2}>
@@ -420,7 +420,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                 </Grid>
                 <Grid container spacing={2}>
                   <Grid item xs={2} className={classes.labelDesign}>
-                    <Typography>Billet Since Nitriding</Typography>
+                    <Typography variant='h6'>Billet Since Nitriding</Typography>
                   </Grid>
                   <Grid item xs={3} sm container>
                     <Grid item xs container direction="column" spacing={2}>
@@ -435,7 +435,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                     </Grid>
                   </Grid>
                   <Grid item xs={2} className={classes.labelDesign}>
-                    <Typography>Billet Until Nitriding</Typography>
+                    <Typography variant='h6'>Billet Until Nitriding</Typography>
                   </Grid>
                   <Grid item xs={3} sm container>
                     <Grid item xs container direction="column" spacing={2}>
@@ -455,7 +455,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                 </Grid>
                 <Grid container spacing={2}>
                   <Grid item xs={2} className={classes.labelDesign}>
-                    <Typography>Problem</Typography>
+                    <Typography variant='h6'>Problem</Typography>
                   </Grid>
                   <Grid item xs={3} sm container>
                     <Grid item xs container direction="column" spacing={2}>
@@ -559,7 +559,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
           >
             <Grid container spacing={2}>
               <Grid item xs={2} className={classes.labelDesign}>
-                <Typography>Corrective Action</Typography>
+                <Typography variant='h6'>Corrective Action</Typography>
               </Grid>
               <Grid item xs={3} sm container>
                 <Grid item xs container direction="column" spacing={2}>
@@ -634,7 +634,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
 
             <Grid container spacing={2}>
               <Grid item xs={2} className={classes.labelDesign}>
-                <Typography>Die State</Typography>
+                <Typography variant='h6'>Die State</Typography>
               </Grid>
               <Grid item xs={3} sm container>
                 <Grid item xs container direction="column" spacing={2}>
@@ -678,7 +678,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={2} className={classes.labelDesign}>
-                <Typography>Rak</Typography>
+                <Typography variant='h6'>Rak</Typography>
               </Grid>
               <Grid item xs={3} sm container>
                 <Grid item xs container direction="column" spacing={2}>

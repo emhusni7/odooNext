@@ -37,6 +37,9 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     marginTop: 10,
   },
+  labelDesign: {
+    fontWeight: "bold"
+  }
 }));
 
 const Transition = React.forwardRef((props, ref) => (
@@ -120,15 +123,14 @@ const CorrActDialog = ({
             </Typography>
           </Toolbar>
         </AppBar>
-        <Typography>
+        
           <Box fontStyle="italic" fontWeight="fontWeightMedium" m={1}>
             Create New Action :
           </Box>
-        </Typography>
         <Paper className={classes.paper} elevation={2}>
           <Grid container spacing={2}>
             <Grid item xs={2} className={classes.labelDesign}>
-              <Typography>Code</Typography>
+              Code
             </Grid>
             <Grid item xs={3} sm container>
               <Grid item xs container direction="column" spacing={2}>
@@ -163,7 +165,7 @@ const CorrActDialog = ({
             </Grid>
 
             <Grid item xs={2} className={classes.labelDesign}>
-              <Typography>Name</Typography>
+              <Typography variant='h6'>Name</Typography>
             </Grid>
             <Grid item xs={3} sm container>
               <Grid item xs container direction="column" spacing={2}>
@@ -199,7 +201,7 @@ const CorrActDialog = ({
           </Grid>
           <Grid container spacing={2}>
             <Grid item xs={2} className={classes.labelDesign}>
-              <Typography>Note</Typography>
+              <Typography variant='h6'>Note</Typography>
             </Grid>
             <Grid item xs={10} sm container>
               <Grid item xs container direction="column" spacing={2}>
