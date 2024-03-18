@@ -29,9 +29,13 @@ const StyledTableCell = withStyles((theme) => ({
   head: {
     backgroundColor: '#2986cc',
     color: theme.palette.common.white,
+    fontWeight:'bold',
+    fontSize: 17
   },
   body: {
     fontSize: 12,
+    fontWeight: "bold",
+    color:'#000',
   },
 }))(TableCell);
 
@@ -522,25 +526,25 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
             <Grid item xs={6} md={6} sm={6}>
               <Paper className={classes.paper} elevation={0}>
               <TextField
-                        id="date_end"
-                        label="Date End"
-                        type="datetime-local"
-                        value={etching.dateEnd ? etching.dateEnd : ''}
-                        onChange={(e) => {
-                          setEtching({...etching, dateEnd: e.target.value})
-                        }}
-                        className={classes.textField}
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        InputProps={{
-                          readOnly: etching.status !== 'In Progress',
-                          inputProps: {
-                            min: date.minDate,
-                            max: date.maxDate,
-                          },
-                        }}
-                      />
+                  id="date_end"
+                  label="Date End"
+                  type="datetime-local"
+                  value={etching.dateEnd ? etching.dateEnd : ''}
+                  onChange={(e) => {
+                    setEtching({...etching, dateEnd: e.target.value})
+                  }}
+                  className={classes.textField}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  InputProps={{
+                    readOnly: etching.status !== 'In Progress',
+                    inputProps: {
+                      min: date.minDate,
+                      max: date.maxDate,
+                    },
+                  }}
+                />
               </Paper>
             </Grid>
             <Grid item xs={6} md={6} sm={6}>
@@ -581,13 +585,9 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                 <Tabs
                   value={value}
                   onChange={handleChange}
-                  indicatorcolor="secondary"
-                  textcolor="secondary"
-                  variant="scrollable"
-                  scrollButtons="auto"
-                  aria-label="scrollable auto tabs example"
+                 
                 >
-                  <Tab label="To Consume" {...a11yProps(0)} />
+                  <Tab label="To Consume" style={{fontWeight: "bold"}} {...a11yProps(0)} />
                   <Tab label="To Produce" {...a11yProps(1)} />
                 </Tabs>
               </AppBar>

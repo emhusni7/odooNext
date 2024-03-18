@@ -27,6 +27,9 @@ const useStyles = makeStyles((theme) => ({
   input: {
     marginLeft: theme.spacing(1),
     flex: 1,
+    "&::placeholder": {
+      color: "#000"
+    },
   },
   iconButton: {
     padding: 10,
@@ -54,7 +57,7 @@ const SearchEtchingCard = ({ id, MoName, product, productionID, type }) => (
           <Typography gutterBottom variant="h5" component="h2">
             {`${MoName}`}
           </Typography>
-          <Typography variant="body2" color="textSecondary" component="p">
+          <Typography variant="body2" style={{fontSize: 'bold'}} color="#000" component="p">
             {product}
           </Typography>
         </CardContent>
@@ -137,6 +140,12 @@ const SearchEtchingPage = ({ setTitle, setLoading }) => {
             value={name}
             name="name"
             id="name"
+            colorSecondary
+            inputProps={{
+              style: {
+                color: '#000'
+              }
+            }}
           />
           <IconButton
             className={classes.iconButton}

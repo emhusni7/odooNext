@@ -558,6 +558,14 @@ const prodDetail = ({ setTitle, setLoading, setMsgBox, loading }) => {
                     }
                   }}
                   loadOptions={filterValue}
+                  theme={theme => ({
+                    ...theme,
+                    colors: {
+                        ...theme.colors,
+                        neutral50: '#000',  // Placeholder color
+                        fontWeight: 'bold'
+                    },
+                })}
                 />
                 <div>
                   {mvLine.productError && (

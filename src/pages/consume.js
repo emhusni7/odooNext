@@ -286,7 +286,7 @@ const ConsumePage = ({ setTitle, setLoading, setMsgBox }) => {
                   name="product"
                   cacheOptions
                   defaultOptions
-                  style={{ width: '100px' }}
+                  style={{ width: '100px',  color: '#000', fontWeight: "bold"}}
                   onChange={(value) => {
                     if (value) {
                       // eslint-disable-next-line no-param-reassign,react/prop-types

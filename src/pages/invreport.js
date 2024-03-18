@@ -12,6 +12,31 @@ import AsyncSelect from 'react-select/async';
 import FormControl from '@material-ui/core/FormControl';
 import OdooLib from '../models/odoo';
 
+const customStyles = {
+  option: (provided, state) => ({
+    ...provided,
+    fontWeight: 'bold',
+    color: state.isSelected ? 'white' : 'black',
+    backgroundColor: state.isSelected ? 'blue' : 'white ',
+    "&:hover": {
+      backgroundColor: "#2574f4"
+    }
+  }),
+  control: (provided) => ({
+    ...provided,
+    color: 'black',
+    fontWeight: 'bold',
+    borderColor: '#2574f4',
+    marginTop: '3%',
+  }),
+  placeholder: (defaultStyles) => {
+    return {
+        ...defaultStyles,
+        color: 'red',
+    }
+}
+};
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
@@ -208,6 +233,14 @@ const InvReport = ({ setTitle, setMsgBox, setLoading }) => {
                   isSearchable
                   placeholder="Internal Category"
                   loadOptions={filterCategory}
+                  theme={theme => ({
+                    ...theme,
+                    colors: {
+                        ...theme.colors,
+                        neutral50: '#000',  // Placeholder color
+                        fontWeight: 'bold'
+                    },
+                })}
                 />
                 <FormHelperText>
                   {/* {!etching.corrid && etching.state === 'startworking'
@@ -225,6 +258,7 @@ const InvReport = ({ setTitle, setMsgBox, setLoading }) => {
                   required
                   defaultOptions
                   isClearable
+                  placeholder="Product"
                   isDisabled={params.status === 'done'}
                   InputLabelProps={{
                     shrink: true,
@@ -247,6 +281,7 @@ const InvReport = ({ setTitle, setMsgBox, setLoading }) => {
                   isSearchable
                   placeholder="Product"
                   loadOptions={filterProduct}
+                  styles={customStyles}
                 />
                 <FormHelperText>
                   {/* {!etching.corrid && etching.state === 'startworking'

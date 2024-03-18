@@ -199,6 +199,31 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const customStyles = {
+  option: (provided, state) => ({
+    ...provided,
+    fontWeight: 'bold',
+    color: state.isSelected ? 'white' : 'black',
+    backgroundColor: state.isSelected ? 'blue' : 'white ',
+    "&:hover": {
+      backgroundColor: "#2574f4"
+    }
+  }),
+  control: (provided) => ({
+    ...provided,
+    color: 'black',
+    fontWeight: 'bold',
+    borderColor: '#2574f4',
+    marginTop: '3%',
+  }),
+  placeholder: (defaultStyles) => {
+    return {
+        ...defaultStyles,
+        color: 'red',
+    }
+}
+};
+
 const EnhancedTable = ({ setTitle, setLoading, setMsgBox }) => {
   const classes = useStyles();
   const odoo = new OdooLib();
@@ -328,6 +353,7 @@ const EnhancedTable = ({ setTitle, setLoading, setMsgBox }) => {
                   isSearchable
                   placeholder="Location"
                   loadOptions={filterLoc}
+                  styles={customStyles}
                 />
                 <FormHelperText>
                   {/* {!etching.corrid && etching.state === 'startworking'
@@ -373,6 +399,7 @@ const EnhancedTable = ({ setTitle, setLoading, setMsgBox }) => {
                     isSearchable
                     placeholder="Product"
                     loadOptions={filterProduct}
+                    styles={customStyles}
                   />
                   <FormHelperText>
                     {/* {!etching.corrid && etching.state === 'startworking'

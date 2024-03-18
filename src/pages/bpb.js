@@ -27,6 +27,10 @@ const useStyles = makeStyles((theme) => ({
   input: {
     marginLeft: theme.spacing(1),
     flex: 1,
+    '&::placeholder': {
+      textOverflow: 'ellipsis !important',
+      color: 'blue'
+    }
   },
   iconButton: {
     padding: 10,
@@ -134,14 +138,16 @@ const BpbPage = ({ setTitle, setLoading, setMsgBox }) => {
           }}
         >
           <InputBase
-            className={classes.input}
+            
             placeholder="Masukkan No PO"
+            className={classes.input}
             name="poName"
             id="poName"
             onChange={(event) => {
               setPO(event.target.value);
             }}
             value={poName}
+            
           />
           <IconButton
             className={classes.iconButton}

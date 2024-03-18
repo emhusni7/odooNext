@@ -31,6 +31,7 @@ const theme = createMuiTheme({
         backgroundColor: '#2986cc',
         minWidth: '100px',
         color: 'white',
+        fontWeight: 'bold',
         margin: '4px',
         '&:hover': {
           backgroundColor: '#29b3af',
@@ -40,6 +41,7 @@ const theme = createMuiTheme({
       outlined: {
         minWidth: '100px',
         color: '#0000FF',
+        fontWeight: 'bold',
         margin: '3px',
         '&:hover': {
           backgroundColor: '#29b3af',
@@ -68,6 +70,12 @@ const theme = createMuiTheme({
         fontWeight: "bold",
         borderColor: "#2e2e2e",
         borderWidth: "2px",
+        "&::placeholder": {
+          color: "#000"
+        },
+      },
+      "&::placeholder": {
+        color: "#000"
       },
     },
     MuiInputBase:{
@@ -77,13 +85,24 @@ const theme = createMuiTheme({
         fontWeight: "bold",
         borderColor: "#2e2e2e",
         borderWidth: "2px",
+        
         "&.Mui-disabled": {
           background: "#eaeaea",
           color: "#000",
           fontWeight: "bold",
-        }
-      },
-      
+        },
+       
+      },  
+      "&::placeholder": {
+        color: "#000",
+        fontWeight: "bold"
+      },    
+    },
+    MuiInput: {
+        "&::placeholder": {
+          color: "#000"
+        },
+        // color: "white", // if you also want to change the color of the input, this is the prop you'd use
       
     },
     MuiInputLabel:{
@@ -91,6 +110,7 @@ const theme = createMuiTheme({
         color: "#000",
         fontFamily: "Arial",
         fontWeight: "bold",
+        fontSize: 21,
         borderColor: "#2e2e2e",
         borderWidth: "2px",
         "&.Mui-disabled": {
@@ -99,7 +119,22 @@ const theme = createMuiTheme({
           fontWeight: "bold",
         }
       },  
-    }
+    },
+    MuiTab: {
+      root:{
+        color: '#000',
+        fontSize: 17,
+        fontWeight: "bold",
+        "selected": {
+          "fontWeight": "bold"
+        },  
+        "&.Mui-selected": {
+          // backgroundColor: theme.palette.secondary.main,
+          borderRadius: "25px",
+          fontWeight: 'bold',
+        }
+      }
+        },
    
     
     

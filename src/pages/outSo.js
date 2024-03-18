@@ -182,6 +182,14 @@ const PrintSo = ({ setTitle, setMsgBox, setLoading }) => {
                 }
               }}
               loadOptions={filterCust}
+              theme={theme => ({
+                ...theme,
+                colors: {
+                    ...theme.colors,
+                    neutral50: '#000',  // Placeholder color
+                    fontWeight: 'bold'
+                },
+            })}
             />
             {forme.customer_id.length <= 0 ? (
               <p style={{ color: 'red' }}>Customer Required Field</p>
