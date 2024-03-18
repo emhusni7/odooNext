@@ -30,10 +30,10 @@ const StyledTableCell = withStyles((theme) => ({
     backgroundColor: '#2986cc',
     color: theme.palette.common.white,
     fontWeight:'bold',
-    fontSize: 17
+    fontSize: 17,
   },
   body: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "bold",
     color:'#000',
   },
