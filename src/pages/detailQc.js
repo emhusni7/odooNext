@@ -221,9 +221,13 @@ const DetailQcPage = ({ record, idx, addScrap, msg, enabled }) => {
           msg({ variant: 'error', message: 'Field Type Harus Di Isi' });
           return reject(); }
 
-        if (['m-potong','m-finish'].includes(newData.resultType)){
+        if (['m-potong','m-finish','r-proses'].includes(newData.resultType)){
           if (!newData.productName){
-            msg({ variant: 'error', message: 'Produk Harus Diisi di pilihan Mutasi' });
+            setTimeout(setLoading(false), 1000);
+            setMsgBox({
+              variant: 'error',
+              message: 'Produk Harus Diisi di pilihan Mutasi/Reproses' ,
+            });
             return reject();
           }
         }
