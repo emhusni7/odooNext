@@ -210,7 +210,6 @@ const DetailQcPage = ({ record, idx, addScrap, msg, enabled }) => {
     // eslint-disable-next-line consistent-return
     onRowAdd: (newData) =>
       new Promise((resolve, reject) => {
-        msg({ variant: 'success', message: '...' });
         if (!newData.scrapQty) {
           msg({ variant: 'error', message: 'Field Isian Qty Scrap Harus Di Isi' });
           return reject();
