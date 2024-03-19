@@ -1237,7 +1237,7 @@ export default class OdooLib {
     }
   }
 
-  async actionDone(data, scrapbs, racks, date) {
+  async actionDone(data, scrapbs, racks, date, downtime_start, downtime_end) {
     try {
       const result = await this.executeKW('mrp.production.output', 'outDone', [
         data,
@@ -1246,6 +1246,8 @@ export default class OdooLib {
         scrapbs,
         racks,
         date,
+        downtime_start,
+        downtime_end
       ]);
       return result;
     } catch (e) {

@@ -99,7 +99,8 @@ const ListPalletOvenRackingUnrackingPage = ({
     minDate: OdooLib.MinDateTime(new Date().toISOString()),
     maxDate: OdooLib.CurrentTime(new Date().toISOString()),
     dateNow: new Date().toISOString(),
-    
+    downtime_start: false,
+    downtime_end: false,    
   });
 
   useEffect(() => {
@@ -259,7 +260,9 @@ const ListPalletOvenRackingUnrackingPage = ({
         outputIds,
         scrapbs,
         racks,
-        OdooLib.OdooDateTime(date.dateNow)
+        OdooLib.OdooDateTime(date.dateNow),
+        date.downtime_start !== false ? OdooLib.OdooDateTime(date.downtime_start): '',
+        date.downtime_end !== false ? OdooLib.OdooDateTime(date.downtime_end): ''
       );
       if (!data.faultCode) {
         const rws = rows
@@ -847,15 +850,116 @@ const ListPalletOvenRackingUnrackingPage = ({
         <Grid item xs={3} md={3} sm={3}>
           <Paper className={classes.paperButton} elevation={0}>
             {disabled || rows.length === 0 ? (
-              ''
+               <Grid container spacing={2}>
+               <Grid item xs={12} sm={12}>
+                 <Paper className={classes.paper} elevation={0}>
+                 <TextField
+                     id="DtStart"
+                     label="Downtime Start"
+                     type="datetime-local"
+                     value={date.downtime_start ? date.downtime_start : false}
+                     onChange={(e) => {
+                       setDate({ ...date, downtime_start: e.target.value });
+                     }}
+                     className={classes.textField}
+                     InputLabelProps={{
+                       shrink: true,
+                     }}
+                     InputProps={{
+                       readOnly: disabled,
+                       inputProps: {
+                         min: date.minDate,
+                         max: date.maxDate,
+                       },
+                     }}
+                   />
+                 </Paper>
+               </Grid>
+               <Grid item xs={12} sm={12}>
+                 <Paper className={classes.paper} elevation={0}>
+                 <TextField
+                     id="dtEnd"
+                     label="Downtime End"
+                     type="datetime-local"
+                     value={date.downtime_end ? date.downtime_end : false}
+                     onChange={(e) => {
+                       setDate({ ...date, downtime_end: e.target.value });
+                     }}
+                     className={classes.textField}
+                     InputLabelProps={{
+                       shrink: true,
+                     }}
+                     InputProps={{
+                       readOnly: disabled,
+                       inputProps: {
+                         min: date.minDate,
+                         max: date.maxDate,
+                       },
+                     }}
+                   />
+                 </Paper>
+               </Grid>  
+               </Grid>
             ) : mode === 'start' ? (
               <Button variant="contained" onClick={(e) => setInwork(e)}>
                 Start
               </Button>
             ) : mode === 'end' ? (
+              <>
+              <Grid container spacing={2}>
+              <Grid item xs={12} sm={12}>
+                <Paper className={classes.paper} elevation={0}>
+                <TextField
+                    id="DtStart"
+                    label="Downtime Start"
+                    type="datetime-local"
+                    value={date.downtime_start ? date.downtime_start : false}
+                    onChange={(e) => {
+                      setDate({ ...date, downtime_start: e.target.value });
+                    }}
+                    className={classes.textField}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    InputProps={{
+                      readOnly: disabled,
+                      inputProps: {
+                        min: date.minDate,
+                        max: date.maxDate,
+                      },
+                    }}
+                  />
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={12}>
+                <Paper className={classes.paper} elevation={0}>
+                <TextField
+                    id="dtEnd"
+                    label="Downtime End"
+                    type="datetime-local"
+                    value={date.downtime_end ? date.downtime_end : false}
+                    onChange={(e) => {
+                      setDate({ ...date, downtime_end: e.target.value });
+                    }}
+                    className={classes.textField}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    InputProps={{
+                      readOnly: disabled,
+                      inputProps: {
+                        min: date.minDate,
+                        max: date.maxDate,
+                      },
+                    }}
+                  />
+                </Paper>
+              </Grid>  
+              </Grid>
               <Button variant="contained" onClick={actionDone}>
                 Finished
               </Button>
+              </>
             ) : (
               ''
             )}
