@@ -224,7 +224,7 @@ const DetailQcPage = ({ record, idx, addScrap, msg, enabled }) => {
         if (['m-potong','m-finish','r-proses'].includes(newData.resultType)){
           if (!newData.productName){
             setTimeout(setLoading(false), 1000);
-            setMsgBox({
+            msg({
               variant: 'error',
               message: 'Produk Harus Diisi di pilihan Mutasi/Reproses' ,
             });
