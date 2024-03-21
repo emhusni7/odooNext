@@ -238,7 +238,7 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
       });
     } else {
 
-      const produce = await odoo.endMelting(melting);
+      const produce = await odoo.endMelting(melting, OdooLib.OdooDateTime(melting.dateEnd));
       if (!produce.faultCode) {
         setMelting({
           ...melting,

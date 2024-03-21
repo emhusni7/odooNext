@@ -840,7 +840,7 @@ export default class OdooLib {
     }
   }
 
-  async endMelting(press) {
+  async endMelting(press, dateEnd) {
     try {
       const result = await this.executeKW(
         'mrp.production.output',
@@ -851,7 +851,7 @@ export default class OdooLib {
           press.note,
           Number(localStorage.getItem('shiftId')),
           press.produce,
-          OdooDateTime(press.dateEnd),
+          dateEnd,
         ]
       );
       return result;
