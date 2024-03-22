@@ -305,17 +305,14 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
       etching.dieId,
       etching.lotBillet,
       etching.note,
-      etching.dateStart !== '' ? OdooLib.OdooDateTime(etching.dateStart): OdooLib.OdooDateTime(date.dateNow)
+      etching.dateStart !== '' ? OdooLib.OdooDateTime(etching.dateStart): ''
     );
     if (!moveLines.faultCode) {
       setEtching((prevState) => ({
         ...prevState,
         ...moveLines,
-        dateStart: moveLines.dateStart !== ''
+        dateStart: moveLines.dateStart !== '' && moveLines.dateEnd !== false
         ? OdooLib.formatDateTime(moveLines.dateStart)
-        : '',
-        dateEnd: moveLines.dateEnd !== ''
-        ? OdooLib.formatDateTime(moveLines.dateEnd)
         : '',
         downtime_start: '',
         downtime_end: '',
@@ -486,7 +483,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                     id="date_start"
                     label="Date Start"
                     type="datetime-local"
-                    value={etching.dateStart ? etching.dateStart : false}
+                    value={etching.dateStart ? etching.dateStart : ''}
                     onChange={(e) => {
                        setEtching({ ...etching, dateStart: e.target.value });
                     }}
@@ -526,7 +523,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                   id="date_end"
                   label="Date End"
                   type="datetime-local"
-                  value={etching.dateEnd ? etching.dateEnd : false }
+                  value={etching.dateEnd ? etching.dateEnd : '' }
                   onChange={(e) => {
                     setEtching({...etching, dateEnd: e.target.value})
                   }}
