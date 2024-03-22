@@ -158,6 +158,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
   const [date, setDate] = React.useState({
     minDate: OdooLib.MinDateTime(new Date().toISOString()),
     maxDate: OdooLib.CurrentTime(new Date().toISOString()),
+    dateNow: OdooLib.CurrentTime(new Date().toISOString())
   });
 
   const shiftId = Number(localStorage.getItem('shiftId'));
@@ -195,8 +196,8 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
     weight_act: 0,
     under_weight: 0,
     recovery: 0,
-    downtime_start: false,
-    downtime_end: false,
+    downtime_start: '',
+    downtime_end: '',
     reason: '',
     total_length: 0,
     kg: 0,
@@ -244,8 +245,8 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
         ...etching,  
         dateStart: etching.dateStart !== '' ? OdooLib.OdooDateTime(etching.dateStart): '',
         dateEnd: etching.dateEnd !== '' ? OdooLib.OdooDateTime(etching.dateEnd): '',
-        downtime_start: etching.downtime_start !== false ? OdooLib.OdooDateTime(etching.downtime_start): '',
-        downtime_end: etching.downtime_end !== false ? OdooLib.OdooDateTime(etching.downtime_end): '',
+        downtime_start: etching.downtime_start !== '' ? OdooLib.OdooDateTime(etching.downtime_start): '',
+        downtime_end: etching.downtime_end !== '' ? OdooLib.OdooDateTime(etching.downtime_end): '',
         downtime_reason: etching.downtime_reason
       })
         
@@ -274,7 +275,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
       etching.produce,
       etching.dateStart !== '' ? OdooLib.OdooDateTime(etching.dateStart): '',
       etching.dateEnd !== '' ? OdooLib.OdooDateTime(etching.dateEnd) : '',
-      etching.downtime_start !== '' ? OdooLib.OdooDateTime(etching.downtime_start): '',
+      etching.downtime_start !== ''  ? OdooLib.OdooDateTime(etching.downtime_start): '',
       etching.downtime_end !== '' ? OdooLib.OdooDateTime(etching.downtime_end) : '',
       etching.downtime_reason
     );
@@ -303,7 +304,8 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
       etching.shiftId,
       etching.dieId,
       etching.lotBillet,
-      etching.note
+      etching.note,
+      etching.dateStart !== '' ? OdooLib.OdooDateTime(etching.dateStart): OdooLib.OdooDateTime(date.dateNow)
     );
     if (!moveLines.faultCode) {
       setEtching((prevState) => ({
@@ -315,6 +317,8 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
         dateEnd: moveLines.dateEnd !== ''
         ? OdooLib.formatDateTime(moveLines.dateEnd)
         : '',
+        downtime_start: '',
+        downtime_end: '',
       }));
     } else {
       setLoading(false);
@@ -329,7 +333,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
     const result = await odoo.saveBillet(
       etching.outputId,
       etching.moname,
-      OdooLib.OdooDateTime(etching.dateStart),
+      etching.dateStart !== '' ? OdooLib.OdooDateTime(etching.dateStart): OdooLib.OdooDateTime(date.dateNow) ,
       productionId,
       etching.consume.filter((x) => x.saved === false && x.btg > 0)
     );
@@ -347,24 +351,17 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
 
   const getWo = async () => {
     const woOrder = await odoo.getWorkOrder(woId);
-    console.log(woOrder);
     setEtching((prev) => ({
       ...prev,
       ...woOrder,
-        dateStart: woOrder.dateStart !== ''
-        ? OdooLib.formatDateTime(woOrder.dateStart)
-        : '',
-        dateEnd: woOrder.dateEnd !== ''
-        ? OdooLib.formatDateTime(woOrder.dateEnd)
-        : '',
+        dateStart: woOrder.dateStart !== '' ?  OdooLib.formatDateTime(woOrder.dateStart): '',
+        dateEnd: woOrder.dateEnd !== '' ? OdooLib.formatDateTime(woOrder.dateEnd) : '',
         downtime_start: woOrder.downtime_start !== ''
         ? OdooLib.formatDateTime(woOrder.downtime_start)
         : '',
         downtime_end: woOrder.downtime_end !== ''
         ? OdooLib.formatDateTime(woOrder.downtime_end)
         : '',
-
-
       }));
   };
 
@@ -529,7 +526,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                   id="date_end"
                   label="Date End"
                   type="datetime-local"
-                  value={etching.dateEnd ? etching.dateEnd : ''}
+                  value={etching.dateEnd ? etching.dateEnd : false }
                   onChange={(e) => {
                     setEtching({...etching, dateEnd: e.target.value})
                   }}
@@ -708,7 +705,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                           id="DtStart"
                           label="Downtime Start"
                           type="datetime-local"
-                          value={etching.downtime_start ? etching.downtime_start : false}
+                          value={etching.downtime_start }
                           onChange={(e) => {
                             setEtching({ ...etching, downtime_start: e.target.value });
                           }}
@@ -732,7 +729,7 @@ const EtchingPage = ({ setTitle, setMsgBox, setLoading }) => {
                           id="dtEnd"
                           label="Downtime End"
                           type="datetime-local"
-                          value={etching.downtime_end ? etching.downtime_end : false}
+                          value={etching.downtime_end}
                           onChange={(e) => {
                             setEtching({ ...etching, downtime_end: e.target.value });
                           }}

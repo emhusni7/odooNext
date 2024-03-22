@@ -99,8 +99,8 @@ const ListPalletOvenRackingUnrackingPage = ({
     minDate: OdooLib.MinDateTime(new Date().toISOString()),
     maxDate: OdooLib.CurrentTime(new Date().toISOString()),
     dateNow: new Date().toISOString(),
-    downtime_start: false,
-    downtime_end: false,    
+    downtime_start: '',
+    downtime_end: '',    
   });
 
   useEffect(() => {
@@ -261,8 +261,8 @@ const ListPalletOvenRackingUnrackingPage = ({
         scrapbs,
         racks,
         OdooLib.OdooDateTime(date.dateNow),
-        date.downtime_start !== false ? OdooLib.OdooDateTime(date.downtime_start): '',
-        date.downtime_end !== false ? OdooLib.OdooDateTime(date.downtime_end): ''
+        date.downtime_start !== '' ? OdooLib.OdooDateTime(date.downtime_start): '',
+        date.downtime_end !== '' ? OdooLib.OdooDateTime(date.downtime_end): ''
       );
       if (!data.faultCode) {
         const rws = rows
@@ -857,7 +857,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                      id="DtStart"
                      label="Downtime Start"
                      type="datetime-local"
-                     value={date.downtime_start ? date.downtime_start : false}
+                     value={date.downtime_start ? date.downtime_start : ''}
                      onChange={(e) => {
                        setDate({ ...date, downtime_start: e.target.value });
                      }}
@@ -881,7 +881,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                      id="dtEnd"
                      label="Downtime End"
                      type="datetime-local"
-                     value={date.downtime_end ? date.downtime_end : false}
+                     value={date.downtime_end ? date.downtime_end : ''}
                      onChange={(e) => {
                        setDate({ ...date, downtime_end: e.target.value });
                      }}
@@ -913,7 +913,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                     id="DtStart"
                     label="Downtime Start"
                     type="datetime-local"
-                    value={date.downtime_start ? date.downtime_start : false}
+                    value={date.downtime_start}
                     onChange={(e) => {
                       setDate({ ...date, downtime_start: e.target.value });
                     }}
@@ -937,7 +937,7 @@ const ListPalletOvenRackingUnrackingPage = ({
                     id="dtEnd"
                     label="Downtime End"
                     type="datetime-local"
-                    value={date.downtime_end ? date.downtime_end : false}
+                    value={date.downtime_end}
                     onChange={(e) => {
                       setDate({ ...date, downtime_end: e.target.value });
                     }}
