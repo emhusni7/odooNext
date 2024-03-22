@@ -177,6 +177,9 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
     produce: [],
     note: '',
     lot: '',
+    dateStart: '',
+    dateEnd: '',
+
   });
   setTitle(melting.name || 'Melting Production');
   const loading = open && options.length === 0;
@@ -238,7 +241,7 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
       });
     } else {
 
-      const produce = await odoo.endMelting(melting, OdooLib.OdooDateTime(melting.dateEnd));
+      const produce = await odoo.endMelting(melting,melting.dateStart !== '' || melting.dateStart !== false ? OdooLib.OdooDateTime(melting.dateStart): '');
       if (!produce.faultCode) {
         setMelting({
           ...melting,
@@ -300,7 +303,7 @@ const MeltingPage = ({ setTitle, setMsgBox, setLoading }) => {
       melting.wcId,
       melting.shiftId,
       melting.note,
-      OdooLib.OdooDateTime(melting.dateStart)
+      melting.dateStart !== '' ? OdooLib.OdooDateTime(melting.dateStart): ''
     );
    
     setLoading(false);
